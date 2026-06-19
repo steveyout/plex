@@ -1,0 +1,6 @@
+{
+  "name": "Plex Stream",
+  "description": "A modern, sleek movie and TV show streaming application styled with Plex-inspired amber aesthetics, featuring multiple server options, full-text search, categories, and watchlist synchronization.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
