@@ -1,5 +1,6 @@
 import express from 'express';
 import path from 'path';
+import fs from 'fs';
 import { createServer as createViteServer } from 'vite';
 import dotenv from 'dotenv';
 
@@ -14,9 +15,45 @@ import {
   getFallbackEpisodes
 } from './src/data/fallbackData.ts';
 
+function slugify(text: string): string {
+  return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+}
+
+function getSEOTags(host: string) {
+  const isPlex = host.includes('plexmovies');
+  const isCinema = host.includes('cinemaos');
+
+  if (isPlex) {
+    return {
+      title: 'PlexMovies - Stream Free Movies & TV Shows Online',
+      description: 'Watch free movies, TV series, and live streaming streams in premium HD quality on PlexMovies. Your ultimate free media server library.',
+      keywords: 'plexmovies, plex movies, free movies, watch tv series, free streaming, hd movies, media server',
+      themeColor: '#E5A00D',
+      siteName: 'PlexMovies'
+    };
+  } else if (isCinema) {
+    return {
+      title: 'CinemaOS - The Ultimate Cinematic Streaming Operating System',
+      description: 'Experience the future of entertainment with CinemaOS. Stream high-definition movies, original series, and customize your personal media dashboard.',
+      keywords: 'cinemaos, cinema os, entertainment system, streaming media, cinematic dashboard, watch free movies, premium tv shows',
+      themeColor: '#e11d48',
+      siteName: 'CinemaOS'
+    };
+  } else {
+    // Default fallback
+    return {
+      title: 'CinemaOS - The Ultimate Cinematic Streaming Operating System',
+      description: 'Experience the future of entertainment with CinemaOS. Stream high-definition movies, original series, and customize your personal media dashboard.',
+      keywords: 'cinemaos, cinema os, entertainment system, streaming media, cinematic dashboard, watch free movies, premium tv shows',
+      themeColor: '#e11d48',
+      siteName: 'CinemaOS'
+    };
+  }
+}
+
 async function startServer() {
   const app = express();
-  const PORT = parseInt(process.env.PORT || '5173', 10);
+  const PORT = 3000;
 
   // JSON request parser
   app.use(express.json());
@@ -178,6 +215,68 @@ async function startServer() {
     });
   });
 
+  // Dynamic sitemap.xml generation
+  app.get('/sitemap.xml', (req, res) => {
+    const host = req.headers.host || 'plexmovies.online';
+    const proto = (req.headers['x-forwarded-proto'] as string) || 'https';
+    const baseUrl = `${proto}://${host}`;
+    
+    // Format current date as YYYY-MM-DD
+    const currentDate = new Date().toISOString().split('T')[0];
+    
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+    xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+    
+    // 1. Core Pages
+    xml += `  <url>\n`;
+    xml += `    <loc>${baseUrl}/</loc>\n`;
+    xml += `    <lastmod>${currentDate}</lastmod>\n`;
+    xml += `    <changefreq>daily</changefreq>\n`;
+    xml += `    <priority>1.0</priority>\n`;
+    xml += `  </url>\n`;
+    
+    xml += `  <url>\n`;
+    xml += `    <loc>${baseUrl}/?tab=movies</loc>\n`;
+    xml += `    <lastmod>${currentDate}</lastmod>\n`;
+    xml += `    <changefreq>daily</changefreq>\n`;
+    xml += `    <priority>0.8</priority>\n`;
+    xml += `  </url>\n`;
+
+    xml += `  <url>\n`;
+    xml += `    <loc>${baseUrl}/?tab=tv</loc>\n`;
+    xml += `    <lastmod>${currentDate}</lastmod>\n`;
+    xml += `    <changefreq>daily</changefreq>\n`;
+    xml += `    <priority>0.8</priority>\n`;
+    xml += `  </url>\n`;
+
+    // 2. Movies from Cinema Catalog Node
+    fallbackMovies.forEach((movie) => {
+      const slug = slugify(movie.title || movie.original_title || 'movie');
+      xml += `  <url>\n`;
+      xml += `    <loc>${baseUrl}/?watch=movie_${movie.id}_${slug}</loc>\n`;
+      xml += `    <lastmod>${currentDate}</lastmod>\n`;
+      xml += `    <changefreq>weekly</changefreq>\n`;
+      xml += `    <priority>0.7</priority>\n`;
+      xml += `  </url>\n`;
+    });
+
+    // 3. TV Shows from Cinema Catalog Node
+    fallbackShows.forEach((show) => {
+      const slug = slugify(show.name || show.original_name || 'tv');
+      xml += `  <url>\n`;
+      xml += `    <loc>${baseUrl}/?watch=tv_${show.id}_${slug}</loc>\n`;
+      xml += `    <lastmod>${currentDate}</lastmod>\n`;
+      xml += `    <changefreq>weekly</changefreq>\n`;
+      xml += `    <priority>0.7</priority>\n`;
+      xml += `  </url>\n`;
+    });
+
+    xml += `</urlset>\n`;
+    
+    res.header('Content-Type', 'application/xml');
+    res.send(xml);
+  });
+
   // Vite middleware setup
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
@@ -187,9 +286,46 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath));
+    // Serve static files without automatically serving index.html, since our wildcard route below handles the injection
+    app.use(express.static(distPath, { index: false }));
+    
     app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
+      const host = req.headers.host || '';
+      const tags = getSEOTags(host);
+      const indexPath = path.join(distPath, 'index.html');
+      
+      try {
+        if (fs.existsSync(indexPath)) {
+          let html = fs.readFileSync(indexPath, 'utf-8');
+          
+          // Replace title tag
+          html = html.replace(/<title>.*?<\/title>/i, `<title>${tags.title}</title>`);
+          
+          // Generate meta tags
+          const metaTags = `
+    <meta name="description" content="${tags.description}" />
+    <meta name="keywords" content="${tags.keywords}" />
+    <meta name="theme-color" content="${tags.themeColor}" />
+    <meta property="og:title" content="${tags.title}" />
+    <meta property="og:description" content="${tags.description}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="${tags.siteName}" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="${tags.title}" />
+    <meta name="twitter:description" content="${tags.description}" />
+          `;
+          
+          // Inject meta tags into the head tag
+          html = html.replace(/<head>/i, `<head>${metaTags}`);
+          
+          res.send(html);
+        } else {
+          res.sendFile(indexPath);
+        }
+      } catch (err) {
+        console.error('Error serving index.html with server-side SEO tags:', err);
+        res.sendFile(indexPath);
+      }
     });
   }
 

@@ -54,12 +54,15 @@ export default function MovieRow({ title, items, onItemClick, onPlayClick }: Mov
     <div className="relative space-y-3 px-4 sm:px-8 group/row">
       {/* Title */}
       {title && (
-        <div className="flex items-center justify-between border-b border-white/5 pb-2">
-          <h3 className="font-display text-xs sm:text-sm font-black tracking-[0.2em] uppercase text-[#F5F5F5] flex items-center gap-3">
-            <span className="w-1 h-4 bg-[#E5A00D] inline-block"></span>
+        <div className="flex items-center justify-between border-b border-zinc-200/80 dark:border-white/5 pb-2">
+          <h3 className="font-display text-xs sm:text-sm font-black tracking-[0.15em] uppercase text-zinc-800 dark:text-[#F5F5F5] flex items-center gap-2">
+            <span className="text-zinc-400 dark:text-gray-500 font-normal">|</span>
             {title}
           </h3>
-          <span className="text-[10px] text-gray-500 font-mono tracking-widest uppercase">({items.length} TITLES)</span>
+          <button className="text-[10px] text-zinc-500 hover:text-zinc-800 dark:text-gray-400 dark:hover:text-white font-semibold tracking-wider uppercase flex items-center gap-1 transition-all cursor-pointer">
+            <span>Browse all</span>
+            <span>&rsaquo;</span>
+          </button>
         </div>
       )}
 
@@ -69,7 +72,7 @@ export default function MovieRow({ title, items, onItemClick, onPlayClick }: Mov
         {showLeftArrow && (
           <button
             onClick={() => handleScroll('left')}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 sm:-translate-x-4 w-9 h-14 bg-black/90 hover:bg-[#080808] border border-white/10 rounded-none text-white flex items-center justify-center shadow-xl hover:text-[#E5A00D] hover:border-[#E5A00D] backdrop-blur-md opacity-0 group-hover/row:opacity-100 transition-all duration-300 z-20 cursor-pointer"
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 sm:translate-x-4 w-9 h-14 bg-white/95 text-zinc-800 border border-zinc-200 shadow-lg hover:text-[#E5A00D] hover:border-[#E5A00D] dark:bg-black/90 dark:text-white dark:border-white/10 dark:hover:bg-[#080808] dark:hover:text-[#E5A00D] dark:hover:border-[#E5A00D] backdrop-blur-md opacity-0 group-hover/row:opacity-100 transition-all duration-300 z-20 cursor-pointer flex items-center justify-center"
             title="Scroll Left"
           >
             <ChevronLeft className="w-5 h-5" />
@@ -102,7 +105,7 @@ export default function MovieRow({ title, items, onItemClick, onPlayClick }: Mov
         {showRightArrow && (
           <button
             onClick={() => handleScroll('right')}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1 sm:translate-x-4 w-9 h-14 bg-black/90 hover:bg-[#080808] border border-white/10 rounded-none text-white flex items-center justify-center shadow-xl hover:text-[#E5A00D] hover:border-[#E5A00D] backdrop-blur-md opacity-0 group-hover/row:opacity-100 transition-all duration-300 z-20 cursor-pointer"
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1 sm:translate-x-4 w-9 h-14 bg-white/95 text-zinc-800 border border-zinc-200 shadow-lg hover:text-[#E5A00D] hover:border-[#E5A00D] dark:bg-black/90 dark:text-white dark:border-white/10 dark:hover:bg-[#080808] dark:hover:text-[#E5A00D] dark:hover:border-[#E5A00D] backdrop-blur-md opacity-0 group-hover/row:opacity-100 transition-all duration-300 z-20 cursor-pointer flex items-center justify-center"
             title="Scroll Right"
           >
             <ChevronRight className="w-5 h-5" />

@@ -194,7 +194,7 @@ export default function VideoPlayer({ item, initialSeason = 1, initialEpisode = 
   const embedUrl = getEmbedUrl(providerId, item.media_type, item.id, currentSeason, currentEpisode);
 
   return (
-    <div className="min-h-screen bg-[#080808] text-gray-100 flex flex-col absolute inset-0 z-50">
+    <div className="min-h-screen bg-[#080808] text-gray-100 flex flex-col fixed inset-0 z-[150]">
       {/* Toast Alert */}
       <AnimatePresence>
         {showShareToast && (

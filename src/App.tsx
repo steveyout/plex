@@ -17,6 +17,26 @@ export default function App() {
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
   const [isDemo, setIsDemo] = useState<boolean>(true);
 
+  // Theme support
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    try {
+      const stored = localStorage.getItem('cinemaos_theme');
+      return (stored === 'light' || stored === 'dark') ? stored : 'dark';
+    } catch {
+      return 'dark';
+    }
+  });
+
+  const toggleTheme = () => {
+    const next = theme === 'dark' ? 'light' : 'dark';
+    setTheme(next);
+    try {
+      localStorage.setItem('cinemaos_theme', next);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   // Content state rows
   const [heroMedia, setHeroMedia] = useState<MediaItem | null>(null);
   const [trendingMovies, setTrendingMovies] = useState<MediaItem[]>([]);
@@ -304,42 +324,28 @@ export default function App() {
     : null;
 
   return (
-    <div className="min-h-screen bg-[#0c0d10] text-[#f3f4f6] font-sans antialiased overflow-x-hidden relative flex">
+    <div className={`min-h-screen font-sans antialiased overflow-x-hidden relative flex transition-colors duration-300 ${
+      theme === 'dark' ? 'bg-[#0c0d10] text-[#f3f4f6]' : 'bg-[#f4f5f6] text-zinc-900'
+    }`}>
       
-      {/* 1. SIDEBAR NAVIGATION - RESPONSIVE DESKTOP */}
+      {/* 1. CINEMAOS FLOATING NAVIGATION (DESKTOP & MOBILE) */}
       <Navbar
         activeTab={activeTab}
         setActiveTab={handleTabChange}
         onSearchClick={() => setIsSearchOpen(true)}
         isDemo={isDemo}
+        theme={theme}
+        toggleTheme={toggleTheme}
       />
 
-      {/* 2. MAIN HUB SHELTER (Indented for sidebar on desktop layouts) */}
-      <div className="flex-1 md:pl-64 min-h-screen flex flex-col pb-24 md:pb-8">
+      {/* 2. MAIN HUB SHELTER (Full width for immersive CinemaOS look) */}
+      <div className="flex-1 min-h-screen flex flex-col pt-20 md:pt-28 pb-24 md:pb-8">
         
-        {/* Absolute Banner for mobile layouts header */}
-        <header className="md:hidden p-4 bg-slate-950/80 border-b border-[#1b1e25] sticky top-0 z-30 backdrop-blur-md flex items-center justify-between">
-          <div className="flex items-center gap-1.5">
-            <span className="font-display font-black text-xl tracking-wider text-[#e5a93b]">PLEX</span>
-            <span className="text-[9px] bg-amber-500/15 text-amber-500 font-semibold px-2 py-0.5 rounded border border-amber-500/20">STREAM</span>
-          </div>
-
-          <button
-            onClick={() => setIsSearchOpen(true)}
-            className="p-2 bg-slate-900 border border-slate-800 rounded-xl hover:bg-slate-800 text-gray-400 hover:text-white transition-all"
-            title="Scan library"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </button>
-        </header>
-
         {/* Global Loading screen */}
         {loading ? (
           <div className="flex-1 flex flex-col items-center justify-center gap-3" id="main-loader-container">
             <span className="w-10 h-10 rounded-full border-4 border-[#e5a93b] border-t-transparent animate-spin inline-block"></span>
-            <span className="text-xs text-gray-500 font-mono">Synchronizing Plex streaming indexing clusters...</span>
+            <span className="text-xs text-gray-500 font-mono">Synchronizing CinemaOS directory indexing clusters...</span>
           </div>
         ) : (
           <AnimatePresence mode="wait">
@@ -355,38 +361,49 @@ export default function App() {
               >
                 {/* HERO BLOCK */}
                 {heroMedia && (
-                  <div className="relative h-[70vh] sm:h-[80vh] w-full flex items-end overflow-hidden pb-16 px-4 sm:px-8 border-b border-white/10" id="hero-banner">
+                  <div className="relative h-[75vh] sm:h-[85vh] w-full flex items-end overflow-hidden pb-16 px-6 sm:px-12 border-b border-white/5" id="hero-banner">
                     {/* Shadowed backdrop backdrop images */}
                     {heroBackdrop ? (
                       <img
                         src={heroBackdrop}
                         alt="Hero Backdrop"
-                        className="absolute inset-0 w-full h-full object-cover brightness-[0.3]"
+                        className="absolute inset-0 w-full h-full object-cover brightness-[0.35]"
                         referrerPolicy="no-referrer"
                       />
                     ) : (
                       <div className="absolute inset-0 bg-gradient-to-br from-[#080808] to-black" />
                     )}
-                    {/* Cinema black grading shadow overlays from Editorial layout patterns */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#080808] via-[#080808]/85 to-transparent"></div>
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#080808]/90 via-transparent to-transparent"></div>
+                    {/* Cinema black/light grading shadow overlays */}
+                    <div className={`absolute inset-0 bg-gradient-to-t via-transparent transition-all duration-300 ${
+                      theme === 'dark' ? 'from-[#0c0d10] via-[#0c0d10]/75' : 'from-[#f4f5f6] via-[#f4f5f6]/75'
+                    }`}></div>
+                    <div className={`absolute inset-0 bg-gradient-to-r via-transparent transition-all duration-300 ${
+                      theme === 'dark' ? 'from-[#0c0d10]/80' : 'from-[#f4f5f6]/80'
+                    }`}></div>
 
                     {/* Content details overlay */}
-                    <div className="relative z-10 max-w-3xl space-y-6">
+                    <div className="relative z-10 max-w-3xl space-y-5">
                       {/* Floating tags */}
-                      <div className="flex flex-wrap items-center gap-3">
-                        <span className="px-2.5 py-0.5 border border-[#E5A00D]/30 text-[9px] uppercase tracking-[0.2em] font-black text-[#E5A00D] bg-[#E5A00D]/10">
-                          Featured Stream
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="px-2.5 py-0.5 border border-[#E5A00D]/30 text-[9px] uppercase tracking-[0.2em] font-black text-[#E5A00D] bg-[#E5A00D]/10 rounded-md">
+                          Featured
                         </span>
-                        <span className="px-2.5 py-0.5 border border-white/10 text-[9px] uppercase tracking-[0.2em] font-bold text-gray-300 bg-white/5">
-                          {heroMedia.media_type === 'tv' ? 'TV SHOWS' : 'MOVIES'}
+                        <span className={`px-2.5 py-0.5 border text-[9px] uppercase tracking-[0.2em] font-bold rounded-md ${
+                          theme === 'dark' ? 'border-white/10 text-gray-300 bg-white/5' : 'border-zinc-300 text-zinc-700 bg-zinc-100'
+                        }`}>
+                          {heroMedia.media_type === 'tv' ? 'TV SERIES' : 'MOVIE'}
                         </span>
-                        <span className="px-2.5 py-0.5 border border-white/10 text-[9px] uppercase tracking-[0.2em] font-medium text-gray-400">
-                          4K Ultra HD
+                        <span className={`px-2.5 py-0.5 border text-[9px] uppercase tracking-[0.2em] font-semibold rounded-md ${
+                          theme === 'dark' ? 'border-white/10 text-gray-400' : 'border-zinc-300 text-zinc-600'
+                        }`}>
+                          Cinema 4K
                         </span>
                       </div>
 
-                      <h1 className="font-display font-black text-3xl sm:text-7xl text-white leading-[0.85] tracking-tighter uppercase mb-2">
+                      {/* Display title in Cinzel serif for ultra high-end Boulevard style */}
+                      <h1 className={`font-serif font-black text-4xl sm:text-7xl leading-[0.95] tracking-tight uppercase mb-2 ${
+                        theme === 'dark' ? 'text-white' : 'text-zinc-900'
+                      }`}>
                         {(() => {
                           const originalTitle = heroMedia.title || heroMedia.name || 'UNTITLED';
                           const words = originalTitle.split(' ');
@@ -396,7 +413,7 @@ export default function App() {
                             return (
                               <>
                                 {firstLine} <br/>
-                                <span className="text-transparent text-outline" style={{ WebkitTextStroke: '1.5px #F5F5F5' }}>{lastWord}</span>
+                                <span className="text-transparent text-outline font-serif" style={{ WebkitTextStroke: theme === 'dark' ? '1.5px #F5F5F5' : '1.5px #111827' }}>{lastWord}</span>
                               </>
                             );
                           }
@@ -404,38 +421,88 @@ export default function App() {
                         })()}
                       </h1>
 
-                      <p className="text-xs sm:text-sm text-gray-400/80 line-clamp-3 leading-relaxed max-w-xl font-normal">
+                      {/* CinemaOS Stars rating line + percentage */}
+                      <div className="flex items-center gap-1">
+                        {[1, 2, 3, 4, 5].map((sIndex) => {
+                          const ratingValue = heroMedia.vote_average || 8.0;
+                          // Scale 10-rating down to 5 stars
+                          const isFilled = sIndex <= Math.round(ratingValue / 2);
+                          return (
+                            <Star
+                              key={sIndex}
+                              className={`w-4 h-4 ${
+                                isFilled ? 'text-amber-400 fill-amber-400' : 'text-zinc-600 fill-transparent'
+                              }`}
+                            />
+                          );
+                        })}
+                        <span className={`text-xs font-bold font-mono ml-2 ${theme === 'dark' ? 'text-gray-300' : 'text-zinc-700'}`}>
+                          {((heroMedia.vote_average || 8.0) * 10).toFixed(1)}%
+                        </span>
+                      </div>
+
+                      <p className={`text-xs sm:text-sm line-clamp-3 leading-relaxed max-w-xl font-normal ${theme === 'dark' ? 'text-gray-300' : 'text-zinc-600'}`}>
                         {heroMedia.overview}
                       </p>
 
                       {/* Info lines tags */}
-                      <div className="flex items-center gap-4 text-[11px] font-mono tracking-widest text-[#F5F5F5]">
-                        <span className="flex items-center gap-1.5 font-bold text-[#E5A00D]">
-                          <Star className="w-3.5 h-3.5 fill-[#E5A00D] text-[#E5A00D]" />
-                          <span>{heroMedia.vote_average ? heroMedia.vote_average.toFixed(1) : '8.5'}</span>
+                      <div className={`flex items-center gap-4 text-[11px] font-mono tracking-widest opacity-80 ${theme === 'dark' ? 'text-[#F5F5F5]' : 'text-zinc-800'}`}>
+                        <span className={`font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-zinc-700'}`}>
+                          RELEASED {heroMedia.release_date ? heroMedia.release_date.split('-')[0] : heroMedia.first_air_date ? heroMedia.first_air_date.split('-')[0] : '2024'}
                         </span>
                         <span className="opacity-40">•</span>
-                        <span className="font-semibold text-gray-300">
-                          {heroMedia.release_date ? heroMedia.release_date.split('-')[0] : heroMedia.first_air_date ? heroMedia.first_air_date.split('-')[0] : '2024'}
-                        </span>
+                        <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-zinc-600'}`}>ULTRA 5.1 SURROUND</span>
                       </div>
 
-                      {/* Media core triggers */}
-                      <div className="flex flex-wrap items-center gap-4 pt-2">
+                      {/* CinemaOS Play & Action Control row */}
+                      <div className="flex flex-wrap items-center gap-3 pt-2">
+                        {/* Play Pill */}
                         <button
                           onClick={() => launchPlayer(heroMedia)}
-                          className="px-8 py-4 bg-white hover:bg-[#E5A00D] hover:text-black text-black font-bold uppercase tracking-[0.15em] text-xs flex items-center gap-2 transition-all duration-300 cursor-pointer rounded-none shadow-none"
+                          className="px-8 py-3 bg-[#e3e4e6] hover:bg-white text-black font-bold uppercase tracking-widest text-xs rounded-full flex items-center gap-2 shadow-lg hover:scale-105 transition-all cursor-pointer duration-200"
                         >
-                          <Play className="w-3.5 h-3.5 fill-current text-black stroke-[2]" />
-                          <span>Watch Now</span>
+                          <Play className="w-3.5 h-3.5 fill-current text-black stroke-[3]" />
+                          <span>Play</span>
                         </button>
 
+                        {/* Save Circle */}
+                        <button
+                          onClick={() => {
+                            const currentWatchlist = [...watchlist];
+                            const exists = currentWatchlist.some(w => w.id === heroMedia.id);
+                            let updated;
+                            if (exists) {
+                              updated = currentWatchlist.filter(w => w.id !== heroMedia.id);
+                            } else {
+                              updated = [...currentWatchlist, {
+                                id: heroMedia.id,
+                                title: heroMedia.title || heroMedia.name || '',
+                                poster_path: heroMedia.poster_path || '',
+                                media_type: heroMedia.media_type || 'movie',
+                                addedAt: new Date().toISOString()
+                              }];
+                            }
+                            localStorage.setItem('plex_watchlist', JSON.stringify(updated));
+                            setWatchlist(updated);
+                            window.dispatchEvent(new Event('watchlist_change'));
+                          }}
+                          className={`p-3 rounded-full transition-all cursor-pointer flex items-center justify-center hover:scale-105 ${
+                            theme === 'dark' ? 'bg-black/40 hover:bg-white/10 border border-white/20 text-white' : 'bg-white hover:bg-zinc-100 border border-zinc-200 text-zinc-800 shadow-md'
+                          }`}
+                          title="Bookmark Media"
+                        >
+                          <Bookmark className={`w-4 h-4 ${watchlist.some(w => w.id === heroMedia.id) ? 'fill-amber-400 text-amber-400 stroke-amber-400' : ''}`} />
+                        </button>
+
+                        {/* Info Circle */}
                         <button
                           onClick={() => launchDetailModal(heroMedia)}
-                          className="px-8 py-4 bg-white/5 hover:bg-white/10 text-white border border-white/20 font-bold uppercase tracking-[0.15em] text-xs flex items-center gap-2 transition-all duration-300 cursor-pointer rounded-none"
+                          className={`p-3 rounded-full transition-all cursor-pointer flex items-center justify-center hover:scale-105 ${
+                            theme === 'dark' ? 'bg-black/40 hover:bg-white/10 border border-white/20 text-white' : 'bg-white hover:bg-zinc-100 border border-zinc-200 text-zinc-800 shadow-md'
+                          }`}
+                          title="More Info"
                         >
-                          <Info className="w-3.5 h-3.5" />
-                          <span>More Info</span>
+                          <Info className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
@@ -445,7 +512,7 @@ export default function App() {
                 {/* 2. CONTINUE PLAYBACK VIEW (Synced Local histories) */}
                 {history && history.length > 0 && (
                   <div className="px-4 sm:px-8 space-y-3">
-                    <h3 className="font-display text-lg sm:text-base font-bold tracking-tight text-white flex items-center gap-2 uppercase">
+                    <h3 className={`font-display text-lg sm:text-base font-bold tracking-tight flex items-center gap-2 uppercase ${theme === 'dark' ? 'text-white' : 'text-zinc-900'}`}>
                       <span className="w-1.5 h-4 bg-amber-400 rounded-full"></span>
                       Resume Streaming
                     </h3>
@@ -455,30 +522,32 @@ export default function App() {
                         <div
                           key={progress.mediaId}
                           onClick={() => launchPlayer({ id: progress.mediaId, media_type: progress.mediaType, overview: '', poster_path: progress.poster_path, backdrop_path: '', vote_average: 1, vote_count: 1 } as any, progress.season, progress.episode)}
-                          className="flex gap-4 p-3 bg-slate-950 border border-slate-800 rounded-xl hover:border-amber-500/30 cursor-pointer shadow-lg hover:shadow-2xl transition-all group"
+                          className={`flex gap-4 p-3 rounded-xl hover:border-amber-500/30 cursor-pointer shadow-lg hover:shadow-2xl transition-all group ${
+                            theme === 'dark' ? 'bg-slate-950 border-slate-800' : 'bg-white border-zinc-200 shadow-sm'
+                          }`}
                         >
                           {progress.poster_path && (
                             <img
                               src={progress.poster_path.startsWith('http') ? progress.poster_path : `https://image.tmdb.org/t/p/w185${progress.poster_path}`}
                               alt={progress.title}
-                              className="w-12 h-18 object-cover rounded-lg shadow border border-slate-900"
+                              className={`w-12 h-18 object-cover rounded-lg shadow border ${theme === 'dark' ? 'border-slate-900' : 'border-zinc-200'}`}
                             />
                           )}
                           <div className="flex-1 min-w-0 flex flex-col justify-between">
                             <div>
-                              <h4 className="text-xs font-bold text-gray-200 truncate group-hover:text-amber-400 transition-colors">{progress.title}</h4>
-                              <p className="text-[10px] text-gray-500 font-mono mt-0.5">
+                              <h4 className={`text-xs font-bold truncate group-hover:text-amber-400 transition-colors ${theme === 'dark' ? 'text-gray-200' : 'text-zinc-850'}`}>{progress.title}</h4>
+                              <p className={`text-[10px] font-mono mt-0.5 ${theme === 'dark' ? 'text-gray-500' : 'text-zinc-500'}`}>
                                 {progress.mediaType === 'tv' ? `Season ${progress.season} : Ep ${progress.episode}` : 'Movie'}
                               </p>
                               {progress.episodeName && (
-                                <p className="text-[9px] text-gray-400 truncate font-sans italic mt-1">&quot;{progress.episodeName}&quot;</p>
+                                <p className={`text-[9px] truncate font-sans italic mt-1 ${theme === 'dark' ? 'text-gray-400' : 'text-zinc-500'}`}>&quot;{progress.episodeName}&quot;</p>
                               )}
                             </div>
                             <div className="flex items-center justify-between text-[8px] text-gray-500 pt-1 font-mono">
                               <span>Watched just now</span>
                               <button
                                 onClick={(e) => removeHistoryItem(progress.mediaId, e)}
-                                className="p-1 hover:bg-slate-800 rounded-md text-gray-500 hover:text-red-400"
+                                className={`p-1 rounded-md text-gray-500 hover:text-red-400 ${theme === 'dark' ? 'hover:bg-slate-800' : 'hover:bg-zinc-100'}`}
                                 title="Dismiss progress"
                               >
                                 <Trash2 className="w-3 h-3" />
@@ -537,19 +606,21 @@ export default function App() {
                 <div className="flex flex-col gap-4">
                   <div className="flex items-center gap-2">
                     <Library className="w-5 h-5 text-amber-500" />
-                    <h2 className="font-display font-black text-xl text-white tracking-tight">
+                    <h2 className={`font-display font-black text-xl tracking-tight ${theme === 'dark' ? 'text-white' : 'text-zinc-900'}`}>
                       Browse Free {activeTab === 'movies' ? 'Movies' : 'TV Shows'}
                     </h2>
                   </div>
 
                   {/* Filter chips listing */}
-                  <div className="flex flex-wrap gap-1 items-center border-b border-slate-900 pb-4">
+                  <div className={`flex flex-wrap gap-1 items-center border-b pb-4 ${theme === 'dark' ? 'border-slate-900' : 'border-zinc-200'}`}>
                     <button
                       onClick={() => setActiveGenreId(null)}
                       className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg border transition-all cursor-pointer ${
                         activeGenreId === null
                           ? 'bg-amber-400/10 border-amber-500/30 text-amber-400'
-                          : 'bg-slate-950 border-slate-900 text-gray-400 hover:text-white'
+                          : theme === 'dark'
+                            ? 'bg-slate-950 border-slate-900 text-gray-400 hover:text-white'
+                            : 'bg-zinc-100 border-zinc-200 text-zinc-600 hover:text-zinc-900'
                       }`}
                     >
                       All Genres
@@ -561,7 +632,9 @@ export default function App() {
                         className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg border transition-all cursor-pointer ${
                           activeGenreId === genre.id
                             ? 'bg-amber-400/10 border-amber-500/30 text-amber-400'
-                            : 'bg-slate-950 border-slate-900 text-gray-400 hover:text-white'
+                            : theme === 'dark'
+                              ? 'bg-slate-950 border-slate-900 text-gray-400 hover:text-white'
+                              : 'bg-zinc-100 border-zinc-200 text-zinc-600 hover:text-zinc-900'
                         }`}
                         id={`category-tag-${genre.id}`}
                       >
@@ -618,8 +691,10 @@ export default function App() {
               >
                 <div className="flex items-center gap-2">
                   <Bookmark className="w-5 h-5 text-amber-500" />
-                  <h2 className="font-display font-black text-xl text-white tracking-tight">My Watchlist</h2>
-                  <span className="text-xs bg-slate-800 text-gray-400 px-2.5 py-0.5 rounded-full font-bold font-mono">
+                  <h2 className={`font-display font-black text-xl tracking-tight ${theme === 'dark' ? 'text-white' : 'text-zinc-900'}`}>My Watchlist</h2>
+                  <span className={`text-xs px-2.5 py-0.5 rounded-full font-bold font-mono ${
+                    theme === 'dark' ? 'bg-slate-800 text-gray-400' : 'bg-zinc-200 text-zinc-600'
+                  }`}>
                     {watchlist.length} ITEMS
                   </span>
                 </div>
@@ -640,7 +715,7 @@ export default function App() {
                       };
                       return (
                         <div key={item.id} className="w-full max-w-[170px] mx-auto">
-                          {/* Wrap in row play handler wrappers directly */}
+                           {/* Wrap in row play handler wrappers directly */}
                           <MovieRow
                             title=""
                             items={[mockCastItem]}
@@ -652,10 +727,12 @@ export default function App() {
                     })}
                   </div>
                 ) : (
-                  <div className="py-24 text-center max-w-sm mx-auto space-y-4 font-sans border border-dashed border-slate-800 rounded-3xl p-8" id="empty-watchlist">
+                  <div className={`py-24 text-center max-w-sm mx-auto space-y-4 font-sans border border-dashed rounded-3xl p-8 ${
+                    theme === 'dark' ? 'border-slate-800' : 'border-zinc-200'
+                  }`} id="empty-watchlist">
                     <Bookmark className="w-10 h-10 text-slate-700 mx-auto" />
                     <div>
-                      <h3 className="font-bold text-base text-gray-200">Watchlist is Empty</h3>
+                      <h3 className={`font-bold text-base ${theme === 'dark' ? 'text-gray-200' : 'text-zinc-800'}`}>Watchlist is Empty</h3>
                       <p className="text-xs text-gray-500 mt-1">Bookmark movies and shows while browsing to save them here for easy playback access later!</p>
                     </div>
                     <button
@@ -678,11 +755,13 @@ export default function App() {
                 exit={{ opacity: 0 }}
                 className="px-4 sm:px-8 pt-6 space-y-6"
               >
-                <div className="flex items-center justify-between border-b border-slate-900 pb-4">
+                <div className={`flex items-center justify-between border-b pb-4 ${theme === 'dark' ? 'border-slate-900' : 'border-zinc-200'}`}>
                   <div className="flex items-center gap-2">
                     <RotateCcw className="w-5 h-5 text-amber-500" />
-                    <h2 className="font-display font-black text-xl text-white tracking-tight">Watching History</h2>
-                    <span className="text-xs bg-slate-800 text-gray-400 px-2.5 py-0.5 rounded-full font-bold font-mono">
+                    <h2 className={`font-display font-black text-xl tracking-tight ${theme === 'dark' ? 'text-white' : 'text-zinc-900'}`}>Watching History</h2>
+                    <span className={`text-xs px-2.5 py-0.5 rounded-full font-bold font-mono ${
+                      theme === 'dark' ? 'bg-slate-800 text-gray-400' : 'bg-zinc-200 text-zinc-600'
+                    }`}>
                       {history.length} SESSIONS
                     </span>
                   </div>
@@ -704,7 +783,9 @@ export default function App() {
                       <div
                         key={session.mediaId}
                         onClick={() => launchPlayer({ id: session.mediaId, media_type: session.mediaType, overview: '', poster_path: session.poster_path, backdrop_path: '', vote_average: 1, vote_count: 1 } as any, session.season, session.episode)}
-                        className="bg-slate-950 border border-slate-900 hover:border-amber-500/20 p-4 rounded-2xl flex items-center justify-between gap-4 cursor-pointer transition-all"
+                        className={`border hover:border-amber-500/20 p-4 rounded-2xl flex items-center justify-between gap-4 cursor-pointer transition-all ${
+                          theme === 'dark' ? 'bg-slate-950 border-slate-900' : 'bg-white border-zinc-200 shadow-sm'
+                        }`}
                         id={`history-row-${session.mediaId}`}
                       >
                         <div className="flex items-center gap-4">
@@ -712,15 +793,17 @@ export default function App() {
                             <img
                               src={session.poster_path.startsWith('http') ? session.poster_path : `https://image.tmdb.org/t/p/w185${session.poster_path}`}
                               alt={session.title}
-                              className="w-10 h-15 object-cover rounded-lg border border-slate-900 shadow shrink-0"
+                              className={`w-10 h-15 object-cover rounded-lg shadow shrink-0 border ${
+                                theme === 'dark' ? 'border-slate-900' : 'border-zinc-200'
+                              }`}
                             />
                           )}
                           <div className="text-left space-y-0.5">
                             <span className="text-[10px] uppercase font-mono font-bold tracking-wide text-amber-400">
                               {session.mediaType === 'tv' ? 'TV SHOWS' : 'MOVIES'}
                             </span>
-                            <h4 className="text-xs sm:text-sm font-bold text-gray-100">{session.title}</h4>
-                            <p className="text-[11px] text-gray-400">
+                            <h4 className={`text-xs sm:text-sm font-bold ${theme === 'dark' ? 'text-gray-100' : 'text-zinc-800'}`}>{session.title}</h4>
+                            <p className={`text-[11px] ${theme === 'dark' ? 'text-gray-400' : 'text-zinc-500'}`}>
                               {session.mediaType === 'tv' 
                                 ? `Resumes at Season ${session.season} : Episode ${session.episode} ${session.episodeName ? `("${session.episodeName}")` : ''}`
                                 : 'Resumes playback stream'
@@ -732,7 +815,9 @@ export default function App() {
                         <div className="flex items-center gap-3">
                           <button
                             onClick={(e) => removeHistoryItem(session.mediaId, e)}
-                            className="p-2 sm:p-2.5 bg-slate-900 hover:bg-red-950/20 text-gray-500 hover:text-red-400 border border-slate-800 rounded-xl"
+                            className={`p-2 sm:p-2.5 hover:bg-red-950/20 text-gray-500 hover:text-red-400 border rounded-xl ${
+                              theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-zinc-100 border-zinc-200'
+                            }`}
                             title="Forget session progress"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -800,6 +885,20 @@ export default function App() {
           />
         )}
       </AnimatePresence>
+
+      {/* Right-side CinemaOS vertical index scrollbar mock */}
+      <div className="hidden lg:flex fixed right-8 top-1/2 -translate-y-1/2 flex-col items-center gap-1.5 z-30 pointer-events-none">
+        <div className="w-[2px] h-48 bg-white/10 rounded-full relative flex items-center justify-center">
+          <div className="absolute top-[35%] w-1.5 h-12 bg-white rounded-full shadow-[0_0_8px_rgba(255,255,255,0.6)]"></div>
+          {/* Subtle dashed marks */}
+          <div className="absolute top-2 w-1.5 h-[1px] bg-white/20"></div>
+          <div className="absolute top-6 w-1.5 h-[1px] bg-white/20"></div>
+          <div className="absolute top-10 w-1.5 h-[1px] bg-white/20"></div>
+          <div className="absolute bottom-10 w-1.5 h-[1px] bg-white/20"></div>
+          <div className="absolute bottom-6 w-1.5 h-[1px] bg-white/20"></div>
+          <div className="absolute bottom-2 w-1.5 h-[1px] bg-white/20"></div>
+        </div>
+      </div>
 
     </div>
   );
