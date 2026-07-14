@@ -3,6 +3,7 @@ import { ArrowLeft, Maximize2, Minimize2, Share2, Server, Play, CheckCircle2, Ch
 import { motion, AnimatePresence } from 'motion/react';
 import { MediaItem, Episode, SeasonInfo } from '../types';
 import { providers, getEmbedUrl, DEFAULT_PROVIDER_ID } from '../config/providers';
+import { useBrand } from '../utils/brand';
 
 interface VideoPlayerProps {
   item: MediaItem;
@@ -12,6 +13,7 @@ interface VideoPlayerProps {
 }
 
 export default function VideoPlayer({ item, initialSeason = 1, initialEpisode = 1, onBack }: VideoPlayerProps) {
+  const brand = useBrand();
   const isTv = item.media_type === 'tv' || !item.title;
   const title = item.title || item.name || 'Untitled';
   
@@ -202,10 +204,10 @@ export default function VideoPlayer({ item, initialSeason = 1, initialEpisode = 
             initial={{ opacity: 0, y: -50, scale: 0.95 }}
             animate={{ opacity: 1, y: 16, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
-            className="fixed top-4 left-1/2 -translate-x-1/2 bg-[#E5A00D] border border-white/10 text-black font-bold uppercase tracking-widest text-[10px] px-6 py-3 rounded-none shadow-2xl flex items-center gap-2 z-50"
+            className={`fixed top-4 left-1/2 -translate-x-1/2 border border-white/10 text-black font-bold uppercase tracking-widest text-[10px] px-6 py-3 rounded-none shadow-2xl flex items-center gap-2 z-50 ${brand.bgAccent}`}
           >
             <CheckCircle2 className="w-4 h-4 text-black" />
-            <span>Link Copied with Playback Configurations!</span>
+            <span>Link Copied with Playback Configurations on {brand.name}!</span>
           </motion.div>
         )}
       </AnimatePresence>
@@ -215,10 +217,11 @@ export default function VideoPlayer({ item, initialSeason = 1, initialEpisode = 
         <div className="flex items-center gap-3">
           <button
             onClick={onBack}
-            className="p-2 sm:p-2.5 bg-black hover:bg-neutral-900 border border-white/10 hover:border-[#E5A00D] text-gray-300 hover:text-white rounded-none transition-all cursor-pointer"
+            className="p-2 sm:p-2.5 bg-black hover:bg-neutral-900 border border-white/10 hover:border-current text-gray-300 hover:text-white rounded-none transition-all cursor-pointer"
+            style={{ color: brand.accentColor } as any}
             id="player-back-btn"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-5 h-5" style={{ color: 'inherit' }} />
           </button>
           <div>
             <h1 className="font-display font-black text-xs sm:text-sm uppercase tracking-wider text-white truncate max-w-[200px] sm:max-w-md">
@@ -229,7 +232,7 @@ export default function VideoPlayer({ item, initialSeason = 1, initialEpisode = 
               {isTv && (
                 <>
                   <span className="w-1 h-1 bg-stone-600"></span>
-                  <span className="text-[#E5A00D] font-bold bg-[#E5A00D]/10 px-1.5 py-0.5 border border-[#E5A00D]/20 rounded-none">S{currentSeason} : E{currentEpisode}</span>
+                  <span className={`font-bold px-1.5 py-0.5 border rounded-none ${brand.badgeBg}`}>S{currentSeason} : E{currentEpisode}</span>
                 </>
               )}
             </p>
@@ -241,7 +244,8 @@ export default function VideoPlayer({ item, initialSeason = 1, initialEpisode = 
           {/* Theater mode switcher */}
           <button
             onClick={() => setIsTheaterMode(!isTheaterMode)}
-            className="p-2 sm:p-2.5 bg-black hover:bg-[#E5A00D]/10 border border-white/10 text-gray-400 hover:text-[#E5A00D] rounded-none transition-all cursor-pointer hidden sm:flex"
+            className="p-2 sm:p-2.5 bg-black hover:bg-neutral-900 border border-white/10 rounded-none transition-all cursor-pointer hidden sm:flex hover:border-current hover:text-current"
+            style={{ color: brand.accentColor } as any}
             title={isTheaterMode ? 'Exit Theater Mode' : 'Enter Theater Mode'}
           >
             {isTheaterMode ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
@@ -250,10 +254,10 @@ export default function VideoPlayer({ item, initialSeason = 1, initialEpisode = 
           {/* Share Button with Slugs */}
           <button
             onClick={handleShare}
-            className="flex items-center gap-1.5 px-4 py-2 bg-white hover:bg-[#E5A00D] text-black rounded-none text-[10px] uppercase tracking-widest font-bold shadow-none transition-all cursor-pointer"
+            className={`flex items-center gap-1.5 px-4 py-2 hover:opacity-90 rounded-none text-[10px] uppercase tracking-widest font-bold shadow-none transition-all cursor-pointer text-black ${brand.bgAccent}`}
             id="player-share-btn"
           >
-            <Share2 className="w-3.5 h-3.5 text-black" />
+            <Share2 className="w-3.5 h-3.5 text-black animate-pulse" />
             <span className="hidden sm:inline">Share Connection</span>
           </button>
         </div>
@@ -272,7 +276,7 @@ export default function VideoPlayer({ item, initialSeason = 1, initialEpisode = 
             {embedUrl ? (
               <iframe
                 src={embedUrl}
-                title={`Plex Video Stream Player - ${title}`}
+                title={`${brand.name} Video Stream Player - ${title}`}
                 className="w-full h-full"
                 allowFullScreen
                 allow="autoplay; encrypted-media; picture-in-picture"
@@ -281,13 +285,13 @@ export default function VideoPlayer({ item, initialSeason = 1, initialEpisode = 
               />
             ) : (
               <div className="p-8 text-center text-gray-400 space-y-3 font-sans">
-                <p className="text-sm font-semibold uppercase tracking-widest">Configuring secure embedding playback link...</p>
+                <p className="text-sm font-semibold uppercase tracking-widest">Configuring secure embedding playback link on {brand.name}...</p>
               </div>
             )}
             
             {/* Overlay notification for ads in some servers */}
-            <div className="absolute bottom-3 left-3 bg-black/90 px-3 py-1.5 rounded-none border border-white/10 text-[9px] font-bold uppercase tracking-widest text-[#E5A00D] flex items-center gap-1.5 pointer-events-none group-hover:opacity-0 transition-opacity">
-              <span className="w-1.5 h-1.5 bg-[#E5A00D] animate-ping"></span>
+            <div className="absolute bottom-3 left-3 bg-black/90 px-3 py-1.5 rounded-none border border-white/10 text-[9px] font-bold uppercase tracking-widest flex items-center gap-1.5 pointer-events-none group-hover:opacity-0 transition-opacity" style={{ color: brand.accentColor }}>
+              <span className="w-1.5 h-1.5 animate-ping" style={{ backgroundColor: brand.accentColor }}></span>
               <span>Hint: Toggle servers for fast playback backup. AdBlocker recommended.</span>
             </div>
           </div>
@@ -302,12 +306,13 @@ export default function VideoPlayer({ item, initialSeason = 1, initialEpisode = 
             <div className="bg-[#080808] border border-white/10 rounded-none p-5 space-y-4">
               <div className="flex items-center justify-between border-b border-white/10 pb-3">
                 <div className="flex items-center gap-2">
-                  <Server className="w-4 h-4 text-[#E5A00D]" />
+                  <Server className="w-4 h-4" style={{ color: brand.accentColor }} />
                   <h3 className="font-display font-black text-[10px] tracking-widest uppercase text-white">Select Broadcast Server</h3>
                 </div>
                 <button 
                   onClick={() => setShowServerTooltip(!showServerTooltip)}
-                  className="p-1 hover:bg-neutral-900 rounded-none text-gray-500 hover:text-[#E5A00D] relative"
+                  className="p-1 hover:bg-neutral-900 rounded-none text-gray-500 relative hover:text-current"
+                  style={{ color: brand.accentColor } as any}
                   title="Server Info"
                 >
                   <HelpCircle className="w-4 h-4" />
@@ -333,9 +338,10 @@ export default function VideoPlayer({ item, initialSeason = 1, initialEpisode = 
                       onClick={() => setProviderId(p.id)}
                       className={`px-3 py-3 rounded-none text-[9px] uppercase tracking-wider text-left font-bold border transition-all flex flex-col justify-center cursor-pointer ${
                         isActive
-                          ? 'bg-[#E5A00D]/10 border-[#E5A00D] text-[#E5A00D]'
+                          ? 'border-current text-current'
                           : 'bg-white/5 hover:bg-neutral-900 border-white/10 text-gray-400 hover:text-white'
                       }`}
+                      style={isActive ? ({ color: brand.accentColor, backgroundColor: `${brand.accentColor}1a` } as any) : {}}
                       id={`server-${p.id}`}
                     >
                       <span>{p.name}</span>
@@ -364,7 +370,7 @@ export default function VideoPlayer({ item, initialSeason = 1, initialEpisode = 
                     <button
                       onClick={nextEpisode}
                       disabled={!!(item.number_of_seasons && currentSeason === item.number_of_seasons && seasonInfo && currentEpisode === seasonInfo.episodes.length)}
-                      className="px-3 py-1.5 bg-[#E5A00D] hover:bg-white text-black font-black uppercase tracking-wider text-[9px] rounded-none cursor-pointer"
+                      className={`px-3 py-1.5 font-black uppercase tracking-wider text-[9px] rounded-none cursor-pointer text-black ${brand.bgAccent}`}
                     >
                       Next
                     </button>
@@ -374,7 +380,7 @@ export default function VideoPlayer({ item, initialSeason = 1, initialEpisode = 
                 {/* Season Select dropdown */}
                 {item.number_of_seasons && item.number_of_seasons > 1 && (
                   <div className="flex items-center gap-3 bg-[#080808] p-2 rounded-none border border-white/10">
-                    <span className="text-[9px] text-[#E5A00D]/60 tracking-widest font-mono pl-1 uppercase font-bold">SELECT SEASON</span>
+                    <span className="text-[9px] tracking-widest font-mono pl-1 uppercase font-bold" style={{ color: `${brand.accentColor}aa` }}>SELECT SEASON</span>
                     <select
                       value={currentSeason}
                       onChange={(e) => {
@@ -396,8 +402,8 @@ export default function VideoPlayer({ item, initialSeason = 1, initialEpisode = 
                 <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
                   {episodesLoading ? (
                     <div className="py-8 text-center text-xs text-gray-500 font-mono tracking-widest uppercase flex items-center justify-center gap-2">
-                      <span className="w-3 h-3 rounded-none border-2 border-[#E5A00D] border-t-transparent animate-spin inline-block"></span>
-                      Syncing season database indexes...
+                      <span className={`w-3 h-3 rounded-none border-2 border-t-transparent animate-spin inline-block ${brand.loaderBorderColor}`}></span>
+                      Syncing season database indexes on {brand.name}...
                     </div>
                   ) : seasonInfo?.episodes && seasonInfo.episodes.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2" id="episodes-list">
@@ -409,9 +415,10 @@ export default function VideoPlayer({ item, initialSeason = 1, initialEpisode = 
                             onClick={() => setCurrentEpisode(ep.episode_number)}
                             className={`p-3 rounded-none border text-left transition-all relative flex flex-col justify-between overflow-hidden cursor-pointer ${
                               isCurrent
-                                ? 'bg-[#E5A00D]/5 border-[#E5A00D] text-[#E5A00D]'
+                                ? 'border-current text-current'
                                 : 'bg-white/5 hover:bg-neutral-900 border-white/10 text-gray-400 hover:text-white'
                             }`}
+                            style={isCurrent ? ({ color: brand.accentColor, backgroundColor: `${brand.accentColor}10` } as any) : {}}
                             id={`episode-${ep.episode_number}`}
                           >
                             <div className="flex items-start justify-between gap-2.5 w-full">
@@ -436,7 +443,7 @@ export default function VideoPlayer({ item, initialSeason = 1, initialEpisode = 
           {/* COL 3: Show/Movie Info Panel Cards Right */}
           <div className="space-y-6">
             <div className="bg-[#080808] border border-white/10 rounded-none p-5 space-y-4">
-              <h3 className="font-display font-black text-[10px] text-[#E5A00D] tracking-widest uppercase">ABOUT SYSTEM CATALOG NODE</h3>
+              <h3 className="font-display font-black text-[10px] tracking-widest uppercase text-white" style={{ color: brand.accentColor }}>ABOUT SYSTEM CATALOG NODE</h3>
               
               <div className="flex gap-4">
                 {item.poster_path && (
@@ -448,11 +455,11 @@ export default function VideoPlayer({ item, initialSeason = 1, initialEpisode = 
                 )}
                 <div className="space-y-1.5">
                   <h4 className="text-xs font-bold text-white uppercase tracking-wider line-clamp-2">{title}</h4>
-                  <p className="text-[10px] text-[#E5A00D] font-mono tracking-widest uppercase">
+                  <p className="text-[10px] font-mono tracking-widest uppercase" style={{ color: brand.accentColor }}>
                     {item.release_date ? item.release_date.substring(0, 4) : item.first_air_date ? item.first_air_date.substring(0, 4) : 'N/A'} YEAR
                   </p>
-                  <p className="text-[10px] text-[#E5A00D] font-mono tracking-widest uppercase flex items-center gap-1.5">
-                    <Star className="w-3.5 h-3.5 fill-[#E5A00D] text-[#E5A00D]" />
+                  <p className="text-[10px] font-mono tracking-widest uppercase flex items-center gap-1.5" style={{ color: brand.accentColor }}>
+                    <Star className={`w-3.5 h-3.5 ${brand.fillAccent} ${brand.textAccent}`} />
                     <span>{item.vote_average ? item.vote_average.toFixed(1) : 'NR'} CRITICS</span>
                   </p>
                 </div>
@@ -475,17 +482,17 @@ export default function VideoPlayer({ item, initialSeason = 1, initialEpisode = 
 
             {/* Quick tips */}
             <div className="bg-[#080808] border border-white/10 rounded-none p-5 space-y-3 relative overflow-hidden">
-              <h3 className="text-[10px] font-black text-[#E5A00D] flex items-center gap-1.5 uppercase tracking-widest">
-                <Play className="w-3 h-3 fill-current text-[#E5A00D]" />
+              <h3 className="text-[10px] font-black flex items-center gap-1.5 uppercase tracking-widest" style={{ color: brand.accentColor }}>
+                <Play className="w-3 h-3 fill-current" />
                 Interactive Directives
               </h3>
               <ul className="text-[10px] text-gray-400 space-y-3.5 list-none font-semibold uppercase tracking-wider">
                 <li className="flex items-start gap-1.5">
-                  <ChevronRight className="w-3.5 h-3.5 text-[#E5A00D] shrink-0 mt-0.5" />
-                  <span>SESSION STATE CACHING AUTOMATICALLY RECORDS TIME CODES AND RESUMPTION VALUES.</span>
+                  <ChevronRight className="w-3.5 h-3.5 shrink-0 mt-0.5" style={{ color: brand.accentColor }} />
+                  <span>SESSION STATE CACHING AUTOMATICALLY RECORDS TIME CODES AND RESUMPTION VALUES ON {brand.name.toUpperCase()}.</span>
                 </li>
                 <li className="flex items-start gap-1.5">
-                  <ChevronRight className="w-3.5 h-3.5 text-[#E5A00D] shrink-0 mt-0.5" />
+                  <ChevronRight className="w-3.5 h-3.5 shrink-0 mt-0.5" style={{ color: brand.accentColor }} />
                   <span>SERVER LATENCY DISRUPTIONS RESOLVE WITH SECURE MIRROR BROADCAST HOVERS.</span>
                 </li>
               </ul>

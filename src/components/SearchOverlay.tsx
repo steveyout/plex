@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Search, X, Star, Film, Tv, Calendar, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MediaItem } from '../types';
+import { useBrand } from '../utils/brand';
 
 interface SearchOverlayProps {
   onClose: () => void;
@@ -11,6 +12,7 @@ interface SearchOverlayProps {
 }
 
 export default function SearchOverlay({ onClose, onItemClick, onPlayClick, isDemo }: SearchOverlayProps) {
+  const brand = useBrand();
   const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState<string>('');
   const [results, setResults] = useState<MediaItem[]>([]);
@@ -123,8 +125,8 @@ export default function SearchOverlay({ onClose, onItemClick, onPlayClick, isDem
         
         {/* Search header container */}
         <div className="flex items-center justify-between gap-4 border-b border-zinc-200 dark:border-white/10 pb-4">
-          <div className="flex-1 flex items-center gap-3 bg-white dark:bg-[#080808] px-4 py-3 border border-zinc-200 dark:border-white/10 rounded-none shadow-none focus-within:border-[#E5A00D]/40 transition-all">
-            <Search className="w-5 h-5 text-[#E5A00D] shrink-0" />
+          <div className="flex-1 flex items-center gap-3 bg-white dark:bg-[#080808] px-4 py-3 border border-zinc-200 dark:border-white/10 rounded-none shadow-none focus-within:border-current transition-all" style={{ color: brand.accentColor } as any}>
+            <Search className="w-5 h-5 shrink-0" style={{ color: brand.accentColor }} />
             <input
               ref={inputRef}
               type="text"
@@ -137,7 +139,7 @@ export default function SearchOverlay({ onClose, onItemClick, onPlayClick, isDem
             {query && (
               <button
                 onClick={() => setQuery('')}
-                className="p-1 hover:bg-zinc-100 dark:hover:bg-neutral-800 rounded-none text-zinc-500 hover:text-zinc-900 dark:text-gray-400 dark:hover:text-white"
+                className="p-1 hover:bg-zinc-100 dark:hover:bg-neutral-800 rounded-none text-zinc-500 hover:text-zinc-900 dark:text-gray-400 dark:hover:text-white cursor-pointer"
                 title="Clear input"
               >
                 <X className="w-4 h-4" />
@@ -147,7 +149,8 @@ export default function SearchOverlay({ onClose, onItemClick, onPlayClick, isDem
 
           <button
             onClick={onClose}
-            className="p-3 bg-white hover:bg-zinc-100 dark:bg-[#080808] dark:hover:bg-[#121212] border border-zinc-200 dark:border-white/10 text-zinc-500 dark:text-gray-400 hover:text-[#E5A00D] dark:hover:text-[#E5A00D] rounded-none transition-all cursor-pointer"
+            className="p-3 bg-white hover:bg-zinc-100 dark:bg-[#080808] dark:hover:bg-[#121212] border border-zinc-200 dark:border-white/10 text-zinc-500 dark:text-gray-400 rounded-none transition-all cursor-pointer hover:border-current hover:text-current"
+            style={{ '--tw-hover-color': brand.accentColor } as any}
             title="Close Search"
             id="close-search-btn"
           >
@@ -166,9 +169,10 @@ export default function SearchOverlay({ onClose, onItemClick, onPlayClick, isDem
                 onClick={() => setMediaTypeFilter(type)}
                 className={`px-4 py-1.5 text-[10px] uppercase tracking-widest font-bold rounded-none transition-all cursor-pointer ${
                   mediaTypeFilter === type
-                    ? 'bg-[#E5A00D] text-black font-bold'
+                    ? 'text-black font-bold'
                     : 'text-zinc-500 dark:text-gray-400 hover:text-zinc-900 dark:hover:text-white bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/5'
                 }`}
+                style={mediaTypeFilter === type ? { backgroundColor: brand.accentColor } : {}}
                 id={`search-filter-${type}`}
               >
                 {type === 'all' ? 'All Formats' : type === 'movie' ? 'Movies' : 'TV Shows'}
@@ -178,12 +182,12 @@ export default function SearchOverlay({ onClose, onItemClick, onPlayClick, isDem
 
           {/* Genre chips selectors */}
           <div className="flex flex-wrap gap-1.5 items-center" id="search-genre-filters">
-            <span className="text-[9px] text-[#E5A00D]/70 font-mono font-bold mr-1 tracking-widest">GENRES:</span>
+            <span className="text-[9px] font-mono font-bold mr-1 tracking-widest uppercase opacity-70" style={{ color: brand.accentColor }}>GENRES:</span>
             <button
               onClick={() => setSelectedGenreId(null)}
               className={`px-3 py-1 text-[9px] font-bold uppercase tracking-widest rounded-none border transition-all cursor-pointer ${
                 selectedGenreId === null
-                  ? 'bg-[#E5A00D]/10 border-[#E5A00D]/30 text-[#E5A00D]'
+                  ? brand.badgeBg
                   : 'bg-zinc-100 dark:bg-white/5 border-zinc-200 dark:border-white/10 text-zinc-500 dark:text-gray-400 hover:text-zinc-900 dark:hover:text-white'
               }`}
             >
@@ -195,7 +199,7 @@ export default function SearchOverlay({ onClose, onItemClick, onPlayClick, isDem
                 onClick={() => setSelectedGenreId(g.id)}
                 className={`px-3 py-1 text-[9px] font-bold uppercase tracking-widest rounded-none border transition-all cursor-pointer ${
                   selectedGenreId === g.id
-                    ? 'bg-[#E5A00D]/10 border-[#E5A00D]/30 text-[#E5A00D]'
+                    ? brand.badgeBg
                     : 'bg-zinc-100 dark:bg-white/5 border-zinc-200 dark:border-white/10 text-zinc-500 dark:text-gray-400 hover:text-zinc-900 dark:hover:text-white'
                 }`}
                 id={`genre-pill-${g.id}`}
@@ -219,9 +223,10 @@ export default function SearchOverlay({ onClose, onItemClick, onPlayClick, isDem
                     <button
                       key={tag.id}
                       onClick={() => setQuery(tag.query)}
-                      className="px-4 py-2 bg-white hover:bg-zinc-100 dark:bg-white/5 dark:hover:bg-neutral-900 border border-zinc-200 dark:border-white/10 hover:border-[#E5A00D]/40 rounded-none text-[10px] font-bold uppercase tracking-wider text-zinc-600 dark:text-gray-300 hover:text-[#E5A00D] dark:hover:text-[#E5A00D] transition-all text-left flex items-center gap-1.5 cursor-pointer shadow-sm"
+                      className="px-4 py-2 bg-white hover:bg-zinc-100 dark:bg-white/5 dark:hover:bg-neutral-900 border border-zinc-200 dark:border-white/10 rounded-none text-[10px] font-bold uppercase tracking-wider text-zinc-600 dark:text-gray-300 transition-all text-left flex items-center gap-1.5 cursor-pointer shadow-sm hover:border-current hover:text-current"
+                      style={{ color: brand.accentColor } as any}
                     >
-                      <Search className="w-3 h-3 text-[#E5A00D]" />
+                      <Search className="w-3 h-3 text-current" />
                       <span>{tag.label}</span>
                     </button>
                   ))}
@@ -229,10 +234,10 @@ export default function SearchOverlay({ onClose, onItemClick, onPlayClick, isDem
               </div>
 
               {isDemo && (
-                <div className="p-5 bg-white dark:bg-white/5 rounded-none border border-zinc-200 dark:border-white/10 text-[10px] tracking-widest text-[#E5A00D] uppercase max-w-xl flex gap-3 shadow-sm">
-                  <AlertCircle className="w-5 h-5 shrink-0 text-[#E5A00D]" />
+                <div className="p-5 bg-white dark:bg-white/5 rounded-none border border-zinc-200 dark:border-white/10 text-[10px] tracking-widest uppercase max-w-xl flex gap-3 shadow-sm" style={{ color: brand.accentColor }}>
+                  <AlertCircle className="w-5 h-5 shrink-0 text-current" />
                   <div>
-                    <span className="font-extrabold block">Plex Database Offline Fallback</span>
+                    <span className="font-extrabold block">{brand.name} Database Offline Fallback</span>
                     <p className="text-zinc-500 dark:text-gray-400 mt-1 uppercase text-[9px] font-semibold leading-relaxed tracking-wider">
                       Type &quot;Interstellar&quot;, &quot;Dune&quot;, or &quot;Breaking Bad&quot; to test. Configure TMDB API keys in Secrets to scan the full cinema catalog index.
                     </p>
@@ -245,7 +250,7 @@ export default function SearchOverlay({ onClose, onItemClick, onPlayClick, isDem
           {/* Search loader spinner */}
           {loading && (
             <div className="py-20 text-center flex flex-col items-center justify-center gap-3">
-              <span className="w-8 h-8 rounded-none border-2 border-[#E5A00D] border-t-transparent animate-spin inline-block"></span>
+              <span className={`w-8 h-8 rounded-none border-2 border-t-transparent animate-spin inline-block ${brand.loaderBorderColor}`}></span>
               <p className="text-[9px] text-zinc-500 dark:text-gray-500 font-mono tracking-widest uppercase">Querying cinema index modules...</p>
             </div>
           )}
@@ -274,7 +279,8 @@ export default function SearchOverlay({ onClose, onItemClick, onPlayClick, isDem
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       onClick={() => onItemClick(item)}
-                      className="bg-white dark:bg-[#080808] border border-zinc-200 dark:border-white/10 hover:border-[#E5A00D] dark:hover:border-[#E5A00D] rounded-none p-2.5 cursor-pointer transition-all hover:shadow-2xl group flex flex-col h-full overflow-hidden"
+                      className="bg-white dark:bg-[#080808] border border-zinc-200 dark:border-white/10 rounded-none p-2.5 cursor-pointer transition-all hover:shadow-2xl group flex flex-col h-full overflow-hidden hover:border-current"
+                      style={{ color: brand.accentColor } as any}
                       id={`search-result-${item.id}`}
                     >
                       {/* Thumbnail frame */}
@@ -292,12 +298,12 @@ export default function SearchOverlay({ onClose, onItemClick, onPlayClick, isDem
                           </div>
                         )}
 
-                        <div className="absolute top-1.5 left-1.5 bg-black/80 px-2 py-0.5 rounded-none text-[8px] font-mono font-bold text-[#E5A00D] flex items-center gap-0.5 border border-white/10">
-                          <Star className="w-2.5 h-2.5 fill-[#E5A00D] text-[#E5A00D]" />
+                        <div className={`absolute top-1.5 left-1.5 bg-black/80 px-2 py-0.5 rounded-none text-[8px] font-mono font-bold flex items-center gap-0.5 border border-white/10 ${brand.textAccent}`}>
+                          <Star className={`w-2.5 h-2.5 ${brand.fillAccent} ${brand.textAccent}`} />
                           <span>{rating}</span>
                         </div>
 
-                        <div className="absolute top-1.5 right-1.5 bg-black/85 border border-white/10 px-2 py-0.5 rounded-none text-[8px] font-mono font-bold tracking-widest text-[#E5A00D]">
+                        <div className={`absolute top-1.5 right-1.5 bg-black/85 border border-white/10 px-2 py-0.5 rounded-none text-[8px] font-mono font-bold tracking-widest ${brand.textAccent}`}>
                           {isTv ? 'TV' : 'MOVIE'}
                         </div>
                       </div>
@@ -305,7 +311,7 @@ export default function SearchOverlay({ onClose, onItemClick, onPlayClick, isDem
                       {/* Decriptive */}
                       <div className="px-1.5 pb-1 flex-1 flex flex-col justify-between">
                         <div className="space-y-1">
-                          <h5 className="text-[10px] uppercase font-bold tracking-widest text-zinc-800 dark:text-gray-100 group-hover:text-[#E5A00D] transition-colors truncate">
+                          <h5 className="text-[10px] uppercase font-bold tracking-widest text-zinc-800 dark:text-gray-100 group-hover:text-current transition-colors truncate">
                             {title}
                           </h5>
                           <p className="text-[8px] text-zinc-400 dark:text-gray-400 font-mono tracking-widest">{year}</p>
@@ -321,10 +327,10 @@ export default function SearchOverlay({ onClose, onItemClick, onPlayClick, isDem
           {/* Empty search results layout */}
           {!loading && query.trim() !== '' && results.length === 0 && (
             <div className="py-20 text-center text-zinc-500 space-y-4 font-sans border border-zinc-200 dark:border-white/10 bg-white dark:bg-white/5 p-8 shadow-sm">
-              <Search className="w-8 h-8 text-[#E5A00D] mx-auto" />
+              <Search className="w-8 h-8 mx-auto" style={{ color: brand.accentColor }} />
               <p className="font-bold text-xs uppercase tracking-[0.2em] text-zinc-800 dark:text-white">Zero Index Nodes Matched Query</p>
               <p className="text-[10px] uppercase tracking-wider text-zinc-400 dark:text-gray-600 max-w-sm mx-auto leading-relaxed">
-                Check spelling parameters or adjust formatted category tags above to scan other film nodes.
+                Check spelling parameters or adjust formatted category tags above to scan other film nodes on {brand.name}.
               </p>
             </div>
           )}

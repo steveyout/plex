@@ -3,7 +3,30 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Google AI Studio App</title>
+    <!-- Dynamic title & theme setup based on domain -->
+    <script>
+      (function() {
+        var host = window.location.hostname;
+        var title = "CinemaOS - The Ultimate Cinematic Streaming Operating System";
+        var themeColor = "#e11d48";
+        if (host.includes("plexmovies")) {
+          title = "PlexMovies - Stream Free Movies & TV Shows Online";
+          themeColor = "#E5A00D";
+        } else if (host.includes("hexa")) {
+          title = "HexaVideo - Premium Next-Gen Streaming Platform";
+          themeColor = "#4f46e5";
+        }
+        document.title = title;
+        
+        // Dynamic theme-color meta tag
+        var metaTheme = document.createElement('meta');
+        metaTheme.setAttribute('name', 'theme-color');
+        metaTheme.setAttribute('content', themeColor);
+        document.head.appendChild(metaTheme);
+      })();
+    </script>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-0FCNC8NBKH"></script>
     <script>

@@ -3,13 +3,17 @@ import { Play, Info, Bookmark, BookmarkCheck, Trash2, Library, Sparkles, Star, C
 import { motion, AnimatePresence } from 'motion/react';
 import Navbar from './components/Navbar';
 import MovieRow from './components/MovieRow';
+import { MovieCardSkeleton } from './components/MovieCard';
 import DetailModal from './components/DetailModal';
 import VideoPlayer from './components/VideoPlayer';
 import SearchOverlay from './components/SearchOverlay';
 import { useSEO } from './utils/seo';
+import { useBrand } from './utils/brand';
 import { MediaItem, NavigationTab, WatchlistItem, PlaybackProgress } from './types';
 
 export default function App() {
+  const brand = useBrand();
+
   // Navigation & View States
   const [activeTab, setActiveTab] = useState<NavigationTab>('home');
   const [selectedMedia, setSelectedMedia] = useState<MediaItem | null>(null);
@@ -56,8 +60,8 @@ export default function App() {
 
   // SEO dynamic meta hooks
   useSEO(
-    activeTab === 'home' ? 'Home' : activeTab === 'movies' ? 'Free Movies' : activeTab === 'tv' ? 'Free TV Shows' : activeTab === 'watchlist' ? 'My Watchlist' : 'Watch History',
-    'Stream free movies and full season episodes of TV shows with multiple high speed media server links. Highly optimized for desktop and mobile playback.'
+    activeTab === 'home' ? 'Home' : activeTab === 'movies' ? `Free ${brand.name} Movies` : activeTab === 'tv' ? `Free ${brand.name} TV Shows` : activeTab === 'watchlist' ? 'My Watchlist' : 'Watch History',
+    `Stream free movies and full season episodes of TV shows on ${brand.name} with multiple high speed media server links. Highly optimized for desktop and mobile playback.`
   );
 
   // Parse configurations mode (Demo vs API live state)
@@ -328,7 +332,7 @@ export default function App() {
       theme === 'dark' ? 'bg-[#0c0d10] text-[#f3f4f6]' : 'bg-[#f4f5f6] text-zinc-900'
     }`}>
       
-      {/* 1. CINEMAOS FLOATING NAVIGATION (DESKTOP & MOBILE) */}
+      {/* 1. FLOATING NAVIGATION (DESKTOP & MOBILE) */}
       <Navbar
         activeTab={activeTab}
         setActiveTab={handleTabChange}
@@ -338,17 +342,9 @@ export default function App() {
         toggleTheme={toggleTheme}
       />
 
-      {/* 2. MAIN HUB SHELTER (Full width for immersive CinemaOS look) */}
+      {/* 2. MAIN HUB SHELTER (Full width for immersive brand look) */}
       <div className="flex-1 min-h-screen flex flex-col pt-20 md:pt-28 pb-24 md:pb-8">
-        
-        {/* Global Loading screen */}
-        {loading ? (
-          <div className="flex-1 flex flex-col items-center justify-center gap-3" id="main-loader-container">
-            <span className="w-10 h-10 rounded-full border-4 border-[#e5a93b] border-t-transparent animate-spin inline-block"></span>
-            <span className="text-xs text-gray-500 font-mono">Synchronizing CinemaOS directory indexing clusters...</span>
-          </div>
-        ) : (
-          <AnimatePresence mode="wait">
+        <AnimatePresence mode="wait">
             
             {/* TAB 1: HOME PANEL */}
             {activeTab === 'home' && (
@@ -360,7 +356,24 @@ export default function App() {
                 className="space-y-12"
               >
                 {/* HERO BLOCK */}
-                {heroMedia && (
+                {loading ? (
+                  <div className="relative h-[75vh] sm:h-[85vh] w-full flex items-end overflow-hidden pb-16 px-6 sm:px-12 border-b border-white/5 bg-zinc-100 dark:bg-zinc-900/10 animate-pulse" id="hero-skeleton">
+                    <div className="relative z-10 max-w-3xl space-y-4 w-full">
+                      <div className="flex gap-2">
+                        <div className="h-5 w-20 bg-zinc-350 dark:bg-zinc-800 rounded-md"></div>
+                        <div className="h-5 w-24 bg-zinc-350 dark:bg-zinc-800 rounded-md"></div>
+                      </div>
+                      <div className="h-12 sm:h-20 w-3/4 bg-zinc-350 dark:bg-zinc-800 rounded-lg"></div>
+                      <div className="h-4 w-1/4 bg-zinc-300 dark:bg-zinc-850 rounded-md"></div>
+                      <div className="h-16 w-full bg-zinc-350 dark:bg-zinc-800/80 rounded-md"></div>
+                      <div className="flex gap-3">
+                        <div className="h-10 w-24 bg-zinc-350 dark:bg-zinc-800 rounded-full"></div>
+                        <div className="h-10 w-10 bg-zinc-350 dark:bg-zinc-800 rounded-full"></div>
+                        <div className="h-10 w-10 bg-zinc-350 dark:bg-zinc-800 rounded-full"></div>
+                      </div>
+                    </div>
+                  </div>
+                ) : heroMedia && (
                   <div className="relative h-[75vh] sm:h-[85vh] w-full flex items-end overflow-hidden pb-16 px-6 sm:px-12 border-b border-white/5" id="hero-banner">
                     {/* Shadowed backdrop backdrop images */}
                     {heroBackdrop ? (
@@ -385,7 +398,7 @@ export default function App() {
                     <div className="relative z-10 max-w-3xl space-y-5">
                       {/* Floating tags */}
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="px-2.5 py-0.5 border border-[#E5A00D]/30 text-[9px] uppercase tracking-[0.2em] font-black text-[#E5A00D] bg-[#E5A00D]/10 rounded-md">
+                        <span className={`px-2.5 py-0.5 border text-[9px] uppercase tracking-[0.2em] font-black rounded-md ${brand.badgeBg}`}>
                           Featured
                         </span>
                         <span className={`px-2.5 py-0.5 border text-[9px] uppercase tracking-[0.2em] font-bold rounded-md ${
@@ -400,7 +413,7 @@ export default function App() {
                         </span>
                       </div>
 
-                      {/* Display title in Cinzel serif for ultra high-end Boulevard style */}
+                      {/* Display title */}
                       <h1 className={`font-serif font-black text-4xl sm:text-7xl leading-[0.95] tracking-tight uppercase mb-2 ${
                         theme === 'dark' ? 'text-white' : 'text-zinc-900'
                       }`}>
@@ -421,7 +434,7 @@ export default function App() {
                         })()}
                       </h1>
 
-                      {/* CinemaOS Stars rating line + percentage */}
+                      {/* Stars rating line */}
                       <div className="flex items-center gap-1">
                         {[1, 2, 3, 4, 5].map((sIndex) => {
                           const ratingValue = heroMedia.vote_average || 8.0;
@@ -431,7 +444,7 @@ export default function App() {
                             <Star
                               key={sIndex}
                               className={`w-4 h-4 ${
-                                isFilled ? 'text-amber-400 fill-amber-400' : 'text-zinc-600 fill-transparent'
+                                isFilled ? `${brand.textAccent} ${brand.fillAccent}` : 'text-zinc-600 fill-transparent'
                               }`}
                             />
                           );
@@ -454,12 +467,13 @@ export default function App() {
                         <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-zinc-600'}`}>ULTRA 5.1 SURROUND</span>
                       </div>
 
-                      {/* CinemaOS Play & Action Control row */}
+                      {/* Play & Action Control row */}
                       <div className="flex flex-wrap items-center gap-3 pt-2">
                         {/* Play Pill */}
                         <button
                           onClick={() => launchPlayer(heroMedia)}
-                          className="px-8 py-3 bg-[#e3e4e6] hover:bg-white text-black font-bold uppercase tracking-widest text-xs rounded-full flex items-center gap-2 shadow-lg hover:scale-105 transition-all cursor-pointer duration-200"
+                          className="px-8 py-3 text-black font-bold uppercase tracking-widest text-xs rounded-full flex items-center gap-2 shadow-lg hover:scale-105 transition-all cursor-pointer duration-200"
+                          style={{ backgroundColor: brand.accentColor }}
                         >
                           <Play className="w-3.5 h-3.5 fill-current text-black stroke-[3]" />
                           <span>Play</span>
@@ -491,7 +505,7 @@ export default function App() {
                           }`}
                           title="Bookmark Media"
                         >
-                          <Bookmark className={`w-4 h-4 ${watchlist.some(w => w.id === heroMedia.id) ? 'fill-amber-400 text-amber-400 stroke-amber-400' : ''}`} />
+                          <Bookmark className="w-4 h-4" style={{ color: watchlist.some(w => w.id === heroMedia.id) ? brand.accentColor : 'inherit' }} />
                         </button>
 
                         {/* Info Circle */}
@@ -513,7 +527,7 @@ export default function App() {
                 {history && history.length > 0 && (
                   <div className="px-4 sm:px-8 space-y-3">
                     <h3 className={`font-display text-lg sm:text-base font-bold tracking-tight flex items-center gap-2 uppercase ${theme === 'dark' ? 'text-white' : 'text-zinc-900'}`}>
-                      <span className="w-1.5 h-4 bg-amber-400 rounded-full"></span>
+                      <span className="w-1.5 h-4 rounded-full" style={{ backgroundColor: brand.accentColor }}></span>
                       Resume Streaming
                     </h3>
                     
@@ -522,20 +536,19 @@ export default function App() {
                         <div
                           key={progress.mediaId}
                           onClick={() => launchPlayer({ id: progress.mediaId, media_type: progress.mediaType, overview: '', poster_path: progress.poster_path, backdrop_path: '', vote_average: 1, vote_count: 1 } as any, progress.season, progress.episode)}
-                          className={`flex gap-4 p-3 rounded-xl hover:border-amber-500/30 cursor-pointer shadow-lg hover:shadow-2xl transition-all group ${
-                            theme === 'dark' ? 'bg-slate-950 border-slate-800' : 'bg-white border-zinc-200 shadow-sm'
-                          }`}
+                          className={`flex gap-4 p-3 rounded-xl cursor-pointer shadow-lg hover:shadow-2xl transition-all group hover:border-current border`}
+                          style={{ '--tw-border-opacity': '0.3', color: brand.accentColor } as any}
                         >
                           {progress.poster_path && (
                             <img
                               src={progress.poster_path.startsWith('http') ? progress.poster_path : `https://image.tmdb.org/t/p/w185${progress.poster_path}`}
                               alt={progress.title}
-                              className={`w-12 h-18 object-cover rounded-lg shadow border ${theme === 'dark' ? 'border-slate-900' : 'border-zinc-200'}`}
+                              className={`w-12 h-18 object-cover rounded-lg shadow border shrink-0 ${theme === 'dark' ? 'border-slate-900' : 'border-zinc-200'}`}
                             />
                           )}
-                          <div className="flex-1 min-w-0 flex flex-col justify-between">
+                          <div className="flex-1 min-w-0 flex flex-col justify-between text-zinc-900 dark:text-gray-100">
                             <div>
-                              <h4 className={`text-xs font-bold truncate group-hover:text-amber-400 transition-colors ${theme === 'dark' ? 'text-gray-200' : 'text-zinc-850'}`}>{progress.title}</h4>
+                              <h4 className={`text-xs font-bold truncate group-hover:text-current transition-colors ${theme === 'dark' ? 'text-gray-200' : 'text-zinc-800'}`} style={{ '--tw-group-hover-color': brand.accentColor } as any}>{progress.title}</h4>
                               <p className={`text-[10px] font-mono mt-0.5 ${theme === 'dark' ? 'text-gray-500' : 'text-zinc-500'}`}>
                                 {progress.mediaType === 'tv' ? `Season ${progress.season} : Ep ${progress.episode}` : 'Movie'}
                               </p>
@@ -547,7 +560,7 @@ export default function App() {
                               <span>Watched just now</span>
                               <button
                                 onClick={(e) => removeHistoryItem(progress.mediaId, e)}
-                                className={`p-1 rounded-md text-gray-500 hover:text-red-400 ${theme === 'dark' ? 'hover:bg-slate-800' : 'hover:bg-zinc-100'}`}
+                                className={`p-1 rounded-md text-gray-500 hover:text-red-400 ${theme === 'dark' ? 'hover:bg-slate-800' : 'hover:bg-zinc-100'} cursor-pointer`}
                                 title="Dismiss progress"
                               >
                                 <Trash2 className="w-3 h-3" />
@@ -565,6 +578,7 @@ export default function App() {
                   <MovieRow
                     title="Trending Movies"
                     items={trendingMovies}
+                    isLoading={loading}
                     onItemClick={launchDetailModal}
                     onPlayClick={launchPlayer}
                   />
@@ -572,6 +586,7 @@ export default function App() {
                   <MovieRow
                     title="Trending TV Shows"
                     items={trendingTv}
+                    isLoading={loading}
                     onItemClick={launchDetailModal}
                     onPlayClick={launchPlayer}
                   />
@@ -579,6 +594,7 @@ export default function App() {
                   <MovieRow
                     title="Popular Releases"
                     items={popularMovies}
+                    isLoading={loading}
                     onItemClick={launchDetailModal}
                     onPlayClick={launchPlayer}
                   />
@@ -586,6 +602,7 @@ export default function App() {
                   <MovieRow
                     title="Top Series Hits"
                     items={popularTv}
+                    isLoading={loading}
                     onItemClick={launchDetailModal}
                     onPlayClick={launchPlayer}
                   />
@@ -605,7 +622,7 @@ export default function App() {
                 {/* Genre filtering list */}
                 <div className="flex flex-col gap-4">
                   <div className="flex items-center gap-2">
-                    <Library className="w-5 h-5 text-amber-500" />
+                    <Library className="w-5 h-5" style={{ color: brand.accentColor }} />
                     <h2 className={`font-display font-black text-xl tracking-tight ${theme === 'dark' ? 'text-white' : 'text-zinc-900'}`}>
                       Browse Free {activeTab === 'movies' ? 'Movies' : 'TV Shows'}
                     </h2>
@@ -617,7 +634,7 @@ export default function App() {
                       onClick={() => setActiveGenreId(null)}
                       className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg border transition-all cursor-pointer ${
                         activeGenreId === null
-                          ? 'bg-amber-400/10 border-amber-500/30 text-amber-400'
+                          ? brand.badgeBg
                           : theme === 'dark'
                             ? 'bg-slate-950 border-slate-900 text-gray-400 hover:text-white'
                             : 'bg-zinc-100 border-zinc-200 text-zinc-600 hover:text-zinc-900'
@@ -631,7 +648,7 @@ export default function App() {
                         onClick={() => setActiveGenreId(genre.id)}
                         className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg border transition-all cursor-pointer ${
                           activeGenreId === genre.id
-                            ? 'bg-amber-400/10 border-amber-500/30 text-amber-400'
+                            ? brand.badgeBg
                             : theme === 'dark'
                               ? 'bg-slate-950 border-slate-900 text-gray-400 hover:text-white'
                               : 'bg-zinc-100 border-zinc-200 text-zinc-600 hover:text-zinc-900'
@@ -646,9 +663,12 @@ export default function App() {
 
                 {/* Loading discover results */}
                 {loadingDiscover ? (
-                  <div className="py-24 text-center flex flex-col items-center justify-center gap-2">
-                    <span className="w-8 h-8 rounded-full border-3 border-amber-400 border-t-transparent animate-spin inline-block"></span>
-                    <p className="text-xs text-gray-500 font-mono">Fetching categorized feeds...</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                    {Array.from({ length: 12 }).map((_, idx) => (
+                      <div key={`discover-skeleton-${idx}`} className="w-full max-w-[170px] mx-auto">
+                        <MovieCardSkeleton />
+                      </div>
+                    ))}
                   </div>
                 ) : discoverItems && discoverItems.length > 0 ? (
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
@@ -690,8 +710,8 @@ export default function App() {
                 className="px-4 sm:px-8 pt-6 space-y-6"
               >
                 <div className="flex items-center gap-2">
-                  <Bookmark className="w-5 h-5 text-amber-500" />
-                  <h2 className={`font-display font-black text-xl tracking-tight ${theme === 'dark' ? 'text-white' : 'text-zinc-900'}`}>My Watchlist</h2>
+                  <Bookmark className="w-5 h-5" style={{ color: brand.accentColor }} />
+                  <h2 className={`font-display font-black text-xl tracking-tight ${theme === 'dark' ? 'text-white' : 'text-zinc-900'}`}>{brand.watchlistLabel}</h2>
                   <span className={`text-xs px-2.5 py-0.5 rounded-full font-bold font-mono ${
                     theme === 'dark' ? 'bg-slate-800 text-gray-400' : 'bg-zinc-200 text-zinc-600'
                   }`}>
@@ -730,14 +750,15 @@ export default function App() {
                   <div className={`py-24 text-center max-w-sm mx-auto space-y-4 font-sans border border-dashed rounded-3xl p-8 ${
                     theme === 'dark' ? 'border-slate-800' : 'border-zinc-200'
                   }`} id="empty-watchlist">
-                    <Bookmark className="w-10 h-10 text-slate-700 mx-auto" />
+                    <Bookmark className="w-10 h-10 text-slate-700 mx-auto animate-bounce" />
                     <div>
-                      <h3 className={`font-bold text-base ${theme === 'dark' ? 'text-gray-200' : 'text-zinc-800'}`}>Watchlist is Empty</h3>
+                      <h3 className={`font-bold text-base ${theme === 'dark' ? 'text-gray-200' : 'text-zinc-800'}`}>{brand.watchlistLabel} is Empty</h3>
                       <p className="text-xs text-gray-500 mt-1">Bookmark movies and shows while browsing to save them here for easy playback access later!</p>
                     </div>
                     <button
                       onClick={() => setActiveTab('home')}
-                      className="px-5 py-2 bg-[#e5a93b] hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow transition-all cursor-pointer"
+                      className="px-5 py-2 text-slate-950 font-bold text-xs rounded-xl shadow transition-all cursor-pointer"
+                      style={{ backgroundColor: brand.accentColor }}
                     >
                       Browse Recommendations
                     </button>
@@ -757,7 +778,7 @@ export default function App() {
               >
                 <div className={`flex items-center justify-between border-b pb-4 ${theme === 'dark' ? 'border-slate-900' : 'border-zinc-200'}`}>
                   <div className="flex items-center gap-2">
-                    <RotateCcw className="w-5 h-5 text-amber-500" />
+                    <RotateCcw className="w-5 h-5" style={{ color: brand.accentColor }} />
                     <h2 className={`font-display font-black text-xl tracking-tight ${theme === 'dark' ? 'text-white' : 'text-zinc-900'}`}>Watching History</h2>
                     <span className={`text-xs px-2.5 py-0.5 rounded-full font-bold font-mono ${
                       theme === 'dark' ? 'bg-slate-800 text-gray-400' : 'bg-zinc-200 text-zinc-600'
@@ -783,9 +804,10 @@ export default function App() {
                       <div
                         key={session.mediaId}
                         onClick={() => launchPlayer({ id: session.mediaId, media_type: session.mediaType, overview: '', poster_path: session.poster_path, backdrop_path: '', vote_average: 1, vote_count: 1 } as any, session.season, session.episode)}
-                        className={`border hover:border-amber-500/20 p-4 rounded-2xl flex items-center justify-between gap-4 cursor-pointer transition-all ${
+                        className={`border p-4 rounded-2xl flex items-center justify-between gap-4 cursor-pointer transition-all ${
                           theme === 'dark' ? 'bg-slate-950 border-slate-900' : 'bg-white border-zinc-200 shadow-sm'
-                        }`}
+                        } hover:border-current`}
+                        style={{ '--tw-border-opacity': '0.3', color: brand.accentColor } as any}
                         id={`history-row-${session.mediaId}`}
                       >
                         <div className="flex items-center gap-4">
@@ -798,8 +820,8 @@ export default function App() {
                               }`}
                             />
                           )}
-                          <div className="text-left space-y-0.5">
-                            <span className="text-[10px] uppercase font-mono font-bold tracking-wide text-amber-400">
+                          <div className="text-left space-y-0.5 text-zinc-900 dark:text-gray-100">
+                            <span className="text-[10px] uppercase font-mono font-bold tracking-wide" style={{ color: brand.accentColor }}>
                               {session.mediaType === 'tv' ? 'TV SHOWS' : 'MOVIES'}
                             </span>
                             <h4 className={`text-xs sm:text-sm font-bold ${theme === 'dark' ? 'text-gray-100' : 'text-zinc-800'}`}>{session.title}</h4>
@@ -815,7 +837,7 @@ export default function App() {
                         <div className="flex items-center gap-3">
                           <button
                             onClick={(e) => removeHistoryItem(session.mediaId, e)}
-                            className={`p-2 sm:p-2.5 hover:bg-red-950/20 text-gray-500 hover:text-red-400 border rounded-xl ${
+                            className={`p-2 sm:p-2.5 hover:bg-red-950/20 text-gray-500 hover:text-red-400 border rounded-xl cursor-pointer ${
                               theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-zinc-100 border-zinc-200'
                             }`}
                             title="Forget session progress"
@@ -831,11 +853,12 @@ export default function App() {
                     <Clock className="w-10 h-10 text-slate-700 mx-auto" />
                     <div>
                       <h3 className="font-bold text-base text-gray-200">No Playback Sessions Found</h3>
-                      <p className="text-xs text-gray-500 mt-1">Your watched history sessions and episodes bookmarks will accumulate logs here dynamically for instant resumption of movies.</p>
+                      <p className="text-xs text-gray-500 mt-1">Your watched history sessions and episodes bookmarks will accumulate logs here dynamically for instant resumption of movies on {brand.name}.</p>
                     </div>
                     <button
                       onClick={() => setActiveTab('home')}
-                      className="px-5 py-2 bg-[#e5a93b] hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow transition-all cursor-pointer"
+                      className="px-5 py-2 text-slate-950 font-bold text-xs rounded-xl shadow transition-all cursor-pointer"
+                      style={{ backgroundColor: brand.accentColor }}
                     >
                       Stream Recommendations
                     </button>
@@ -845,7 +868,6 @@ export default function App() {
             )}
 
           </AnimatePresence>
-        )}
       </div>
 
       {/* 3. CORE SUB-MODALS INSERTS */}
@@ -889,7 +911,7 @@ export default function App() {
       {/* Right-side CinemaOS vertical index scrollbar mock */}
       <div className="hidden lg:flex fixed right-8 top-1/2 -translate-y-1/2 flex-col items-center gap-1.5 z-30 pointer-events-none">
         <div className="w-[2px] h-48 bg-white/10 rounded-full relative flex items-center justify-center">
-          <div className="absolute top-[35%] w-1.5 h-12 bg-white rounded-full shadow-[0_0_8px_rgba(255,255,255,0.6)]"></div>
+          <div className="absolute top-[35%] w-1.5 h-12 rounded-full shadow-[0_0_8px_rgba(255,255,255,0.6)]" style={{ backgroundColor: brand.accentColor }}></div>
           {/* Subtle dashed marks */}
           <div className="absolute top-2 w-1.5 h-[1px] bg-white/20"></div>
           <div className="absolute top-6 w-1.5 h-[1px] bg-white/20"></div>

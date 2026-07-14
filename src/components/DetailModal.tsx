@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Play, Bookmark, BookmarkCheck, X, Star, Calendar, Clock, Share2, Sparkles, Check, Film, Tv } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MediaItem, CastMember, SeasonInfo, Episode } from '../types';
+import { useBrand } from '../utils/brand';
 
 interface DetailModalProps {
   item: MediaItem;
@@ -11,6 +12,7 @@ interface DetailModalProps {
 }
 
 export default function DetailModal({ item, onClose, onPlayClick, isDemo }: DetailModalProps) {
+  const brand = useBrand();
   const isTv = item.media_type === 'tv' || !item.title;
   const title = item.title || item.name || 'Untitled';
   const rawDate = item.release_date || item.first_air_date || '';
@@ -130,7 +132,7 @@ export default function DetailModal({ item, onClose, onPlayClick, isDemo }: Deta
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 16 }}
             exit={{ opacity: 0, y: -10 }}
-            className="fixed top-4 left-1/2 -translate-x-1/2 bg-[#E5A00D] text-black font-bold uppercase tracking-widest text-[10px] px-6 py-3 rounded-none shadow-2xl z-[160] flex items-center gap-1.5 border border-white/10"
+            className={`fixed top-4 left-1/2 -translate-x-1/2 text-black font-bold uppercase tracking-widest text-[10px] px-6 py-3 rounded-none shadow-2xl z-[160] flex items-center gap-1.5 border border-white/10 ${brand.bgAccent}`}
           >
             <Check className="w-4 h-4 text-black stroke-[3]" />
             <span>Title share link copied to clipboard!</span>
@@ -180,7 +182,7 @@ export default function DetailModal({ item, onClose, onPlayClick, isDemo }: Deta
                   {item.genres.slice(0, 3).map((g) => (
                     <span
                       key={g.id}
-                      className="text-[9px] sm:text-[10px] bg-[#E5A00D]/15 text-[#E5A00D] px-2.5 py-0.5 border border-[#E5A00D]/20 rounded-none font-bold font-mono tracking-widest uppercase"
+                      className={`text-[9px] sm:text-[10px] px-2.5 py-0.5 border rounded-none font-bold font-mono tracking-widest uppercase ${brand.badgeBg}`}
                     >
                       {g.name}
                     </span>
@@ -197,8 +199,8 @@ export default function DetailModal({ item, onClose, onPlayClick, isDemo }: Deta
                   <Calendar className="w-3.5 h-3.5 text-gray-200" />
                   <span>{year}</span>
                 </div>
-                <div className="flex items-center gap-1.5 text-[#E5A00D] font-bold bg-[#080808]/85 px-1.5 py-0.5 rounded-none border border-white/10">
-                  <Star className="w-3.5 h-3.5 fill-[#E5A00D] text-[#E5A00D]" />
+                <div className="flex items-center gap-1.5 font-bold bg-[#080808]/85 px-1.5 py-0.5 rounded-none border border-white/10" style={{ color: brand.accentColor }}>
+                  <Star className={`w-3.5 h-3.5 ${brand.fillAccent} ${brand.textAccent}`} />
                   <span>{rating}</span>
                 </div>
                 {item.runtime && (
@@ -214,7 +216,7 @@ export default function DetailModal({ item, onClose, onPlayClick, isDemo }: Deta
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => onPlayClick(item)}
-                className="flex items-center gap-2 px-6 py-3 bg-[#E5A00D] hover:bg-amber-500 text-black rounded-none text-xs sm:text-sm font-black uppercase tracking-[0.15em] transition-all cursor-pointer shadow-lg"
+                className={`flex items-center gap-2 px-6 py-3 text-black hover:opacity-90 rounded-none text-xs sm:text-sm font-black uppercase tracking-[0.15em] transition-all cursor-pointer shadow-lg ${brand.bgAccent}`}
                 id="modal-play-btn"
               >
                 <Play className="w-4 h-4 fill-current text-black stroke-[3]" />
@@ -225,9 +227,10 @@ export default function DetailModal({ item, onClose, onPlayClick, isDemo }: Deta
                 onClick={toggleWatchlist}
                 className={`flex items-center justify-center p-3 sm:px-4 rounded-none border text-xs sm:text-sm font-bold uppercase tracking-widest transition-all cursor-pointer ${
                   isInWatchlist
-                    ? 'bg-[#E5A00D] text-black border-[#E5A00D]'
+                    ? 'text-black border-transparent'
                     : 'bg-black/50 hover:bg-black/80 border-white/10 text-gray-300 hover:text-white'
                 }`}
+                style={isInWatchlist ? { backgroundColor: brand.accentColor } : {}}
                 title="Add to Watchlist"
                 id="modal-watchlist-btn"
               >
@@ -263,7 +266,7 @@ export default function DetailModal({ item, onClose, onPlayClick, isDemo }: Deta
           <div className="space-y-2">
             <h3 className="font-display font-black text-xs text-zinc-500 dark:text-gray-400 tracking-[0.2em] uppercase">Overview Description</h3>
             <p className="text-sm text-zinc-600 dark:text-gray-300 leading-relaxed max-w-3xl" id="modal-overview-text">
-              {item.overview || 'Description not imported from TMDB database registry. Connect real API keys to sync full metadata descriptors.'}
+              {item.overview || `Description not imported from TMDB database registry. Connect real API keys to sync full metadata descriptors on ${brand.name}.`}
             </p>
           </div>
 
@@ -287,7 +290,7 @@ export default function DetailModal({ item, onClose, onPlayClick, isDemo }: Deta
                             referrerPolicy="no-referrer"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center font-display font-black text-[#E5A00D]/20 text-sm">
+                          <div className="w-full h-full flex items-center justify-center font-display font-black text-sm" style={{ color: `${brand.accentColor}33` }}>
                             {actor.name.split(' ').map(n=>n[0]).join('')}
                           </div>
                         )}
@@ -306,7 +309,7 @@ export default function DetailModal({ item, onClose, onPlayClick, isDemo }: Deta
             <div className="space-y-4 pt-4 border-t border-zinc-200 dark:border-white/10">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-1.5 text-zinc-800 dark:text-white">
-                  <Tv className="w-4 h-4 text-[#E5A00D]" />
+                  <Tv className="w-4 h-4" style={{ color: brand.accentColor }} />
                   <h3 className="font-display font-black text-xs uppercase tracking-widest">TV Episode Navigation</h3>
                 </div>
 
@@ -318,9 +321,10 @@ export default function DetailModal({ item, onClose, onPlayClick, isDemo }: Deta
                       onClick={() => setActiveSeason(sNum)}
                       className={`px-3.5 py-1 text-xs font-bold uppercase tracking-wider rounded-none shrink-0 border transition-all cursor-pointer ${
                         activeSeason === sNum
-                          ? 'bg-[#E5A00D]/15 border-[#E5A00D] text-[#E5A00D]'
+                          ? 'border-current text-current'
                           : 'bg-zinc-100 border-zinc-200 text-zinc-600 hover:text-zinc-900 dark:bg-white/5 dark:border-white/10 dark:text-gray-400 dark:hover:text-white'
                       }`}
+                      style={activeSeason === sNum ? ({ color: brand.accentColor, backgroundColor: `${brand.accentColor}1a` } as any) : {}}
                       id={`modal-season-tab-${sNum}`}
                     >
                       Season {sNum}
@@ -333,7 +337,7 @@ export default function DetailModal({ item, onClose, onPlayClick, isDemo }: Deta
               <div className="space-y-2.5 max-h-96 overflow-y-auto pr-1">
                 {loadingEpisodes ? (
                   <div className="py-8 text-center text-xs text-zinc-500 dark:text-gray-500 font-mono flex items-center justify-center gap-2">
-                    <span className="w-3 h-3 rounded-none border-2 border-[#E5A00D] border-t-transparent animate-spin inline-block"></span>
+                    <span className={`w-3 h-3 rounded-none border-2 border-t-transparent animate-spin inline-block ${brand.loaderBorderColor}`}></span>
                     Fetching Season Structure...
                   </div>
                 ) : seasonEpisodes && seasonEpisodes.length > 0 ? (
@@ -341,12 +345,13 @@ export default function DetailModal({ item, onClose, onPlayClick, isDemo }: Deta
                     {seasonEpisodes.map((ep) => (
                       <div
                         key={ep.id}
-                        className="bg-zinc-50 border border-zinc-200 hover:border-[#E5A00D]/30 dark:bg-[#080808] dark:border-white/10 dark:hover:border-[#E5A00D]/30 p-3 sm:p-4 rounded-none flex flex-col sm:flex-row gap-4 items-start justify-between transition-all"
+                        className="bg-zinc-50 border border-zinc-200 hover:border-current dark:bg-[#080808] dark:border-white/10 transition-all p-3 sm:p-4 rounded-none flex flex-col sm:flex-row gap-4 items-start justify-between"
+                        style={{ '--tw-hover-border-opacity': '0.3' } as any}
                         id={`modal-episode-card-${ep.episode_number}`}
                       >
                         <div className="flex-1 space-y-1.5 text-left">
                           <div className="flex items-center gap-2">
-                            <span className="text-[9px] bg-[#E5A00D]/10 text-[#E5A00D] px-2 py-0.5 rounded-none font-mono font-bold tracking-widest border border-[#E5A00D]/10 leading-none">
+                            <span className={`text-[9px] px-2 py-0.5 rounded-none font-mono font-bold tracking-widest border leading-none ${brand.badgeBg}`}>
                               EPISODE {ep.episode_number}
                             </span>
                             <h4 className="text-xs sm:text-xs font-bold uppercase tracking-wide text-zinc-800 dark:text-gray-100">{ep.name || `Episode ${ep.episode_number}`}</h4>
@@ -359,7 +364,8 @@ export default function DetailModal({ item, onClose, onPlayClick, isDemo }: Deta
                         {/* Play trigger button next to each individual episode list item */}
                         <button
                           onClick={() => onPlayClick(item, activeSeason, ep.episode_number)}
-                          className="w-full sm:w-auto px-4 py-2 sm:mt-1 bg-zinc-800 text-white hover:bg-[#E5A00D] hover:text-black dark:bg-white dark:text-black dark:hover:bg-[#E5A00D] font-bold text-xs rounded-none border border-zinc-300 dark:border-white/10 hover:border-transparent flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                          className={`w-full sm:w-auto px-4 py-2 sm:mt-1 font-bold text-xs rounded-none border border-zinc-300 dark:border-white/10 hover:border-transparent flex items-center justify-center gap-1.5 transition-all cursor-pointer bg-zinc-800 text-white dark:bg-white dark:text-black hover:text-white dark:hover:text-white hover:bg-current dark:hover:bg-current`}
+                          style={{ color: brand.accentColor } as any}
                           id={`modal-play-episode-${ep.episode_number}`}
                         >
                           <Play className="w-3 h-3 fill-current leading-none" />
@@ -379,7 +385,7 @@ export default function DetailModal({ item, onClose, onPlayClick, isDemo }: Deta
           {item.recommendations?.results && item.recommendations.results.length > 0 && (
             <div className="space-y-3 pt-4 border-t border-zinc-200 dark:border-white/10">
               <div className="flex items-center gap-1.5 text-zinc-800 dark:text-white">
-                <Sparkles className="w-4 h-4 text-[#E5A00D]" />
+                <Sparkles className="w-4 h-4" style={{ color: brand.accentColor }} />
                 <h3 className="font-display font-black text-xs text-zinc-500 dark:text-gray-400 tracking-[0.2em] uppercase">More Like This</h3>
               </div>
               <div className="flex gap-4 overflow-x-auto pb-4 scroll-smooth no-scrollbar" id="modal-recommendations">
@@ -396,7 +402,8 @@ export default function DetailModal({ item, onClose, onPlayClick, isDemo }: Deta
                         onClose();
                         onPlayClick(rec);
                       }}
-                      className="flex-shrink-0 w-24 bg-zinc-50 border border-zinc-200 hover:border-[#E5A00D] dark:bg-white/5 dark:border-white/10 dark:hover:border-[#E5A00D] p-1.5 rounded-none text-left space-y-1.5 transition-all text-xs active:scale-95 cursor-pointer"
+                      className="flex-shrink-0 w-24 bg-zinc-50 border border-zinc-200 dark:bg-white/5 dark:border-white/10 p-1.5 rounded-none text-left space-y-1.5 transition-all text-xs active:scale-95 cursor-pointer hover:border-current"
+                      style={{ color: brand.accentColor } as any}
                       id={`modal-rec-${rec.id}`}
                     >
                       <div className="aspect-[2/3] w-full bg-[#080808] rounded-none overflow-hidden">
