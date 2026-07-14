@@ -34,11 +34,11 @@ function getSEOTags(host: string) {
     };
   } else if (isHexa) {
     return {
-      title: 'HexaVideo - Premium Next-Gen Streaming Platform',
-      description: 'Step into the next generation of cinematic media with HexaVideo. Watch premium films, high-fidelity streams, and customize your ultra-modern immersive playback terminal.',
-      keywords: 'hexavideo, hexa video, video streaming, futuristic media player, premium cinema, next-gen streams, ai video hub',
+      title: 'Hexa - Premium Next-Gen Streaming Platform',
+      description: 'Step into the next generation of cinematic media with Hexa. Watch premium films, high-fidelity streams, and customize your ultra-modern immersive playback terminal.',
+      keywords: 'hexa, movie, series, free movies, watch tv series, free streaming, hd movies, watch series online, cinematic player, premium streams',
       themeColor: '#4f46e5',
-      siteName: 'HexaVideo'
+      siteName: 'Hexa'
     };
   } else {
     // Default fallback

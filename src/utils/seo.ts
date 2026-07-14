@@ -18,8 +18,8 @@ export function useSEO(title: string, description?: string) {
       defaultDesc = 'Watch free movies, TV series, and live streaming streams in premium HD quality on PlexMovies. Your ultimate free media server library.';
       themeColor = '#E5A00D';
     } else if (isHexa) {
-      siteName = 'HexaVideo';
-      defaultDesc = 'Step into the next generation of cinematic media with HexaVideo. Watch premium films, high-fidelity streams, and customize your ultra-modern immersive playback terminal.';
+      siteName = 'Hexa';
+      defaultDesc = 'Step into the next generation of cinematic media with Hexa. Watch premium films, high-fidelity streams, and customize your ultra-modern immersive playback terminal.';
       themeColor = '#4f46e5';
     } else {
       siteName = 'CinemaOS';
@@ -49,7 +49,7 @@ export function useSEO(title: string, description?: string) {
     const keywords = isPlex 
       ? 'plexmovies, plex movies, free movies, watch tv series, free streaming, hd movies, media server'
       : isHexa
-      ? 'hexavideo, hexa video, video streaming, futuristic media player, premium cinema, next-gen streams, ai video hub'
+      ? 'hexa, movie, series, free movies, watch tv series, free streaming, hd movies, watch series online, cinematic player, premium streams'
       : 'cinemaos, cinema os, entertainment system, streaming media, cinematic dashboard, watch free movies, premium tv shows';
     metaKeywords.setAttribute('content', keywords);
 
