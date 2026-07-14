@@ -17,7 +17,9 @@ export default defineConfig(() => {
         '.plexmovies.online',
         'cinemaos.online',
         'cinemaos',
-        '.cinemaos'
+        '.cinemaos',
+        'hexa.video',
+        '.hexa.video'
       ],
       // HMR is disabled in AI Studio via DISABLE_HMR env var.
       hmr: process.env.DISABLE_HMR !== 'true',

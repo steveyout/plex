@@ -21,7 +21,8 @@ function slugify(text: string): string {
 
 function getSEOTags(host: string) {
   const isPlex = host.includes('plexmovies');
-  const isCinema = host.includes('cinemaos');
+  const isHexa = host.includes('hexa');
+  const isCinema = host.includes('cinemaos') || (!isPlex && !isHexa);
 
   if (isPlex) {
     return {
@@ -31,13 +32,13 @@ function getSEOTags(host: string) {
       themeColor: '#E5A00D',
       siteName: 'PlexMovies'
     };
-  } else if (isCinema) {
+  } else if (isHexa) {
     return {
-      title: 'CinemaOS - The Ultimate Cinematic Streaming Operating System',
-      description: 'Experience the future of entertainment with CinemaOS. Stream high-definition movies, original series, and customize your personal media dashboard.',
-      keywords: 'cinemaos, cinema os, entertainment system, streaming media, cinematic dashboard, watch free movies, premium tv shows',
-      themeColor: '#e11d48',
-      siteName: 'CinemaOS'
+      title: 'HexaVideo - Premium Next-Gen Streaming Platform',
+      description: 'Step into the next generation of cinematic media with HexaVideo. Watch premium films, high-fidelity streams, and customize your ultra-modern immersive playback terminal.',
+      keywords: 'hexavideo, hexa video, video streaming, futuristic media player, premium cinema, next-gen streams, ai video hub',
+      themeColor: '#4f46e5',
+      siteName: 'HexaVideo'
     };
   } else {
     // Default fallback
@@ -277,6 +278,42 @@ async function startServer() {
     res.send(xml);
   });
 
+  // Dynamic favicon & icon generator/router based on hostname
+  app.get(['/favicon.svg', '/favicon.ico', '/apple-touch-icon.png', '/icon.png'], (req, res) => {
+    const host = req.headers.host || '';
+    const isPlex = host.includes('plexmovies');
+    const isHexa = host.includes('hexa');
+
+    let svg = '';
+
+    if (isPlex) {
+      // Golden yellow play button with a dotted circular progress track
+      svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="128" height="128">
+  <rect width="100" height="100" rx="22" fill="#080808" stroke="#E5A00D" stroke-width="4"/>
+  <polygon points="40,30 75,50 40,70" fill="#E5A00D"/>
+  <circle cx="50" cy="50" r="44" fill="none" stroke="#E5A00D" stroke-width="2" stroke-dasharray="6,4"/>
+</svg>`;
+    } else if (isHexa) {
+      // High-tech deep indigo geometric hexagon with play triangle
+      svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="128" height="128">
+  <rect width="100" height="100" rx="22" fill="#0c0d10" stroke="#4f46e5" stroke-width="4"/>
+  <polygon points="50,15 80,32.5 80,67.5 50,85 20,67.5 20,32.5" fill="none" stroke="#4f46e5" stroke-width="3"/>
+  <polygon points="43,35 68,50 43,65" fill="#4f46e5"/>
+</svg>`;
+    } else {
+      // CinemaOS: Crimson red cinematic movie reel style
+      svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="128" height="128">
+  <rect width="100" height="100" rx="22" fill="#080808" stroke="#e11d48" stroke-width="4"/>
+  <circle cx="50" cy="50" r="30" fill="none" stroke="#e11d48" stroke-width="5"/>
+  <circle cx="50" cy="50" r="18" fill="none" stroke="#e11d48" stroke-width="3" stroke-dasharray="5,3"/>
+  <polygon points="45,38 65,50 45,62" fill="#e11d48"/>
+</svg>`;
+    }
+
+    res.header('Content-Type', 'image/svg+xml');
+    res.send(svg);
+  });
+
   // Vite middleware setup
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
@@ -301,7 +338,7 @@ async function startServer() {
           // Replace title tag
           html = html.replace(/<title>.*?<\/title>/i, `<title>${tags.title}</title>`);
           
-          // Generate meta tags
+          // Generate meta tags & dynamic favicons
           const metaTags = `
     <meta name="description" content="${tags.description}" />
     <meta name="keywords" content="${tags.keywords}" />
@@ -313,6 +350,8 @@ async function startServer() {
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="${tags.title}" />
     <meta name="twitter:description" content="${tags.description}" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
           `;
           
           // Inject meta tags into the head tag

@@ -29,6 +29,8 @@ export default function Navbar({ activeTab, setActiveTab, onSearchClick, isDemo,
       const hostname = window.location.hostname;
       if (hostname.includes('plexmovies')) {
         setBrand('PlexMovies');
+      } else if (hostname.includes('hexa')) {
+        setBrand('HexaVideo');
       } else {
         setBrand('CinemaOS');
       }

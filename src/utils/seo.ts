@@ -6,17 +6,25 @@ export function useSEO(title: string, description?: string) {
 
     const hostname = window.location.hostname;
     const isPlex = hostname.includes('plexmovies');
-    const isCinema = hostname.includes('cinemaos');
+    const isHexa = hostname.includes('hexa');
+    const isCinema = hostname.includes('cinemaos') || (!isPlex && !isHexa);
     
     let siteName = 'CinemaOS';
     let defaultDesc = 'Experience the future of entertainment with CinemaOS. Stream high-definition movies, original series, and customize your personal media dashboard.';
+    let themeColor = '#e11d48';
     
     if (isPlex) {
       siteName = 'PlexMovies';
       defaultDesc = 'Watch free movies, TV series, and live streaming streams in premium HD quality on PlexMovies. Your ultimate free media server library.';
-    } else if (isCinema) {
+      themeColor = '#E5A00D';
+    } else if (isHexa) {
+      siteName = 'HexaVideo';
+      defaultDesc = 'Step into the next generation of cinematic media with HexaVideo. Watch premium films, high-fidelity streams, and customize your ultra-modern immersive playback terminal.';
+      themeColor = '#4f46e5';
+    } else {
       siteName = 'CinemaOS';
       defaultDesc = 'Experience the future of entertainment with CinemaOS. Stream high-definition movies, original series, and customize your personal media dashboard.';
+      themeColor = '#e11d48';
     }
 
     // Set page title
@@ -40,6 +48,8 @@ export function useSEO(title: string, description?: string) {
     }
     const keywords = isPlex 
       ? 'plexmovies, plex movies, free movies, watch tv series, free streaming, hd movies, media server'
+      : isHexa
+      ? 'hexavideo, hexa video, video streaming, futuristic media player, premium cinema, next-gen streams, ai video hub'
       : 'cinemaos, cinema os, entertainment system, streaming media, cinematic dashboard, watch free movies, premium tv shows';
     metaKeywords.setAttribute('content', keywords);
 
@@ -50,6 +60,24 @@ export function useSEO(title: string, description?: string) {
       metaTheme.setAttribute('name', 'theme-color');
       document.head.appendChild(metaTheme);
     }
-    metaTheme.setAttribute('content', isPlex ? '#E5A00D' : '#e11d48');
+    metaTheme.setAttribute('content', themeColor);
+
+    // Inject favicon dynamically
+    let favLink = document.querySelector('link[rel="icon"]') as HTMLLinkElement;
+    if (!favLink) {
+      favLink = document.createElement('link');
+      favLink.setAttribute('rel', 'icon');
+      document.head.appendChild(favLink);
+    }
+    favLink.setAttribute('type', 'image/svg+xml');
+    favLink.setAttribute('href', '/favicon.svg');
+
+    let appleLink = document.querySelector('link[rel="apple-touch-icon"]') as HTMLLinkElement;
+    if (!appleLink) {
+      appleLink = document.createElement('link');
+      appleLink.setAttribute('rel', 'apple-touch-icon');
+      document.head.appendChild(appleLink);
+    }
+    appleLink.setAttribute('href', '/apple-touch-icon.png');
   }, [title, description]);
 }
