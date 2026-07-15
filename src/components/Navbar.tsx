@@ -47,7 +47,7 @@ export default function Navbar({ activeTab, setActiveTab, onSearchClick, isDemo,
       case 'watchlist':
         if (brand.name === 'PlexMovies') {
           return { label: 'Watchlist', Icon: Bookmark };
-        } else if (brand.name === 'Hexa' || brand.name === 'HexaVideo') {
+        } else if (brand.name.startsWith('Hexa') || brand.name === 'HexaVideo') {
           return { label: 'Library', Icon: Library };
         } else {
           return { label: 'Anime', Icon: Cat };
@@ -55,7 +55,7 @@ export default function Navbar({ activeTab, setActiveTab, onSearchClick, isDemo,
       case 'history':
         if (brand.name === 'PlexMovies') {
           return { label: 'History', Icon: RotateCcw };
-        } else if (brand.name === 'Hexa' || brand.name === 'HexaVideo') {
+        } else if (brand.name.startsWith('Hexa') || brand.name === 'HexaVideo') {
           return { label: 'Sessions', Icon: Clock };
         } else {
           return { label: 'Music', Icon: Music };

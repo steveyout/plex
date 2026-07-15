@@ -34,20 +34,20 @@ function getSEOTags(host: string) {
     };
   } else if (isHexa) {
     return {
-      title: 'Hexa - Premium Next-Gen Streaming Platform',
-      description: 'Step into the next generation of cinematic media with Hexa. Watch premium films, high-fidelity streams, and customize your ultra-modern immersive playback terminal.',
-      keywords: 'hexa, movie, series, free movies, watch tv series, free streaming, hd movies, watch series online, cinematic player, premium streams',
+      title: 'Hexa Watch - Stream Movies & TV Shows Online',
+      description: 'Watch your favorite movies and TV shows on Hexa Watch. Stream the latest releases and classic titles.',
+      keywords: 'hexa, hexa watch, movie, series, free movies, watch tv series, free streaming, hd movies, watch series online, cinematic player, premium streams, cineby, yflix, flixhq',
       themeColor: '#4f46e5',
-      siteName: 'Hexa'
+      siteName: 'Hexa Watch'
     };
   } else {
     // Default fallback
     return {
-      title: 'CinemaOS - The Ultimate Cinematic Streaming Operating System',
-      description: 'Experience the future of entertainment with CinemaOS. Stream high-definition movies, original series, and customize your personal media dashboard.',
-      keywords: 'cinemaos, cinema os, entertainment system, streaming media, cinematic dashboard, watch free movies, premium tv shows',
+      title: 'Cinemaos - Stream Movies & TV Shows Online',
+      description: 'Beautifully designed website where you can watch anime, drama, movies and read mangas for free. CinemaOS operates as a content aggregator',
+      keywords: 'cinemaos, cinema os, cineby, yflix, flixhq, anime, watch anime, read manga, watch drama, free movies, watch tv series, entertainment system, streaming media, content aggregator',
       themeColor: '#e11d48',
-      siteName: 'CinemaOS'
+      siteName: 'Cinemaos'
     };
   }
 }

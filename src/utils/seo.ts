@@ -9,8 +9,8 @@ export function useSEO(title: string, description?: string) {
     const isHexa = hostname.includes('hexa');
     const isCinema = hostname.includes('cinemaos') || (!isPlex && !isHexa);
     
-    let siteName = 'CinemaOS';
-    let defaultDesc = 'Experience the future of entertainment with CinemaOS. Stream high-definition movies, original series, and customize your personal media dashboard.';
+    let siteName = 'Cinemaos';
+    let defaultDesc = 'Beautifully designed website where you can watch anime, drama, movies and read mangas for free. CinemaOS operates as a content aggregator';
     let themeColor = '#e11d48';
     
     if (isPlex) {
@@ -18,17 +18,27 @@ export function useSEO(title: string, description?: string) {
       defaultDesc = 'Watch free movies, TV series, and live streaming streams in premium HD quality on PlexMovies. Your ultimate free media server library.';
       themeColor = '#E5A00D';
     } else if (isHexa) {
-      siteName = 'Hexa';
-      defaultDesc = 'Step into the next generation of cinematic media with Hexa. Watch premium films, high-fidelity streams, and customize your ultra-modern immersive playback terminal.';
+      siteName = 'Hexa Watch';
+      defaultDesc = 'Watch your favorite movies and TV shows on Hexa Watch. Stream the latest releases and classic titles.';
       themeColor = '#4f46e5';
     } else {
-      siteName = 'CinemaOS';
-      defaultDesc = 'Experience the future of entertainment with CinemaOS. Stream high-definition movies, original series, and customize your personal media dashboard.';
+      siteName = 'Cinemaos';
+      defaultDesc = 'Beautifully designed website where you can watch anime, drama, movies and read mangas for free. CinemaOS operates as a content aggregator';
       themeColor = '#e11d48';
     }
 
     // Set page title
-    document.title = `${title} | ${siteName}`;
+    if (title === 'Home') {
+      if (isPlex) {
+        document.title = 'PlexMovies - Stream Free Movies & TV Shows Online';
+      } else if (isHexa) {
+        document.title = 'Hexa Watch - Stream Movies & TV Shows Online';
+      } else {
+        document.title = 'Cinemaos - Stream Movies & TV Shows Online';
+      }
+    } else {
+      document.title = `${title} | ${siteName}`;
+    }
     
     // Set meta description
     let metaDesc = document.querySelector('meta[name="description"]');
@@ -37,7 +47,8 @@ export function useSEO(title: string, description?: string) {
       metaDesc.setAttribute('name', 'description');
       document.head.appendChild(metaDesc);
     }
-    metaDesc.setAttribute('content', description || defaultDesc);
+    // Use the specific brand description for home page to ensure it matches user request
+    metaDesc.setAttribute('content', title === 'Home' ? defaultDesc : (description || defaultDesc));
 
     // Set keywords
     let metaKeywords = document.querySelector('meta[name="keywords"]');
@@ -47,10 +58,10 @@ export function useSEO(title: string, description?: string) {
       document.head.appendChild(metaKeywords);
     }
     const keywords = isPlex 
-      ? 'plexmovies, plex movies, free movies, watch tv series, free streaming, hd movies, media server'
+      ? 'plexmovies, plex movies, free movies, watch tv series, free streaming, hd movies, media server, cineby, yflix, flixhq'
       : isHexa
-      ? 'hexa, movie, series, free movies, watch tv series, free streaming, hd movies, watch series online, cinematic player, premium streams'
-      : 'cinemaos, cinema os, entertainment system, streaming media, cinematic dashboard, watch free movies, premium tv shows';
+      ? 'hexa, hexa watch, movie, series, free movies, watch tv series, free streaming, hd movies, watch series online, cinematic player, premium streams, cineby, yflix, flixhq'
+      : 'cinemaos, cinema os, cineby, yflix, flixhq, anime, watch anime, read manga, watch drama, free movies, watch tv series, entertainment system, streaming media, content aggregator';
     metaKeywords.setAttribute('content', keywords);
 
     // Set theme-color meta tag dynamically to match the branding

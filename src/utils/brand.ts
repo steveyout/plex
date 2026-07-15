@@ -35,7 +35,7 @@ export function getBrandConfig(hostname: string): BrandConfig {
     };
   } else if (hostname.includes('hexa')) {
     return {
-      name: 'Hexa',
+      name: 'Hexa Watch',
       accentColor: '#4f46e5',
       textAccent: 'text-[#4f46e5]',
       bgAccent: 'bg-[#4f46e5]',
