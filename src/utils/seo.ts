@@ -7,7 +7,8 @@ export function useSEO(title: string, description?: string) {
     const hostname = window.location.hostname;
     const isPlex = hostname.includes('plexmovies');
     const isHexa = hostname.includes('hexa');
-    const isCinema = hostname.includes('cinemaos') || (!isPlex && !isHexa);
+    const isFlixer = hostname.includes('flixer');
+    const isCinema = hostname.includes('cinemaos') || (!isPlex && !isHexa && !isFlixer);
     
     let siteName = 'Cinemaos';
     let defaultDesc = 'Beautifully designed website where you can watch anime, drama, movies and read mangas for free. CinemaOS operates as a content aggregator';
@@ -21,6 +22,10 @@ export function useSEO(title: string, description?: string) {
       siteName = 'Hexa Watch';
       defaultDesc = 'Watch your favorite movies and TV shows on Hexa Watch. Stream the latest releases and classic titles.';
       themeColor = '#4f46e5';
+    } else if (isFlixer) {
+      siteName = 'Flixer';
+      defaultDesc = 'Watch your favorite movies and TV shows on Flixer. Stream the latest releases and classic titles.';
+      themeColor = '#ef4444';
     } else {
       siteName = 'Cinemaos';
       defaultDesc = 'Beautifully designed website where you can watch anime, drama, movies and read mangas for free. CinemaOS operates as a content aggregator';
@@ -33,6 +38,8 @@ export function useSEO(title: string, description?: string) {
         document.title = 'PlexMovies - Stream Free Movies & TV Shows Online';
       } else if (isHexa) {
         document.title = 'Hexa Watch - Stream Movies & TV Shows Online';
+      } else if (isFlixer) {
+        document.title = 'Flixer - Stream Movies & TV Shows Online';
       } else {
         document.title = 'Cinemaos - Stream Movies & TV Shows Online';
       }
@@ -61,6 +68,8 @@ export function useSEO(title: string, description?: string) {
       ? 'plexmovies, plex movies, free movies, watch tv series, free streaming, hd movies, media server, cineby, yflix, flixhq'
       : isHexa
       ? 'hexa, hexa watch, movie, series, free movies, watch tv series, free streaming, hd movies, watch series online, cinematic player, premium streams, cineby, yflix, flixhq'
+      : isFlixer
+      ? 'flixer, flixer movies, flixer free movies, watch tv series online, free streaming, hd movies, watch series online, cinematic player, premium streams, cineby, yflix, flixhq'
       : 'cinemaos, cinema os, cineby, yflix, flixhq, anime, watch anime, read manga, watch drama, free movies, watch tv series, entertainment system, streaming media, content aggregator';
     metaKeywords.setAttribute('content', keywords);
 

@@ -49,6 +49,22 @@ export function getBrandConfig(hostname: string): BrandConfig {
       loaderBorderColor: 'border-[#4f46e5]',
       badgeBg: 'bg-[#4f46e5]/10 text-[#4f46e5] border-[#4f46e5]/30',
     };
+  } else if (hostname.includes('flixer')) {
+    return {
+      name: 'Flixer',
+      accentColor: '#ef4444',
+      textAccent: 'text-[#ef4444]',
+      bgAccent: 'bg-[#ef4444]',
+      borderAccent: 'border-[#ef4444]',
+      hoverTextAccent: 'hover:text-[#ef4444]',
+      hoverBgAccent: 'hover:bg-[#ef4444]',
+      hoverBorderAccent: 'hover:border-[#ef4444]',
+      fillAccent: 'fill-[#ef4444]',
+      shadowAccent: 'shadow-[#ef4444]/50',
+      focusRingAccent: 'focus:ring-[#ef4444]',
+      loaderBorderColor: 'border-[#ef4444]',
+      badgeBg: 'bg-[#ef4444]/10 text-[#ef4444] border-[#ef4444]/30',
+    };
   } else {
     return {
       name: 'CinemaOS',

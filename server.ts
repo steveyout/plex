@@ -22,7 +22,8 @@ function slugify(text: string): string {
 function getSEOTags(host: string) {
   const isPlex = host.includes('plexmovies');
   const isHexa = host.includes('hexa');
-  const isCinema = host.includes('cinemaos') || (!isPlex && !isHexa);
+  const isFlixer = host.includes('flixer');
+  const isCinema = host.includes('cinemaos') || (!isPlex && !isHexa && !isFlixer);
 
   if (isPlex) {
     return {
@@ -39,6 +40,14 @@ function getSEOTags(host: string) {
       keywords: 'hexa, hexa watch, movie, series, free movies, watch tv series, free streaming, hd movies, watch series online, cinematic player, premium streams, cineby, yflix, flixhq',
       themeColor: '#4f46e5',
       siteName: 'Hexa Watch'
+    };
+  } else if (isFlixer) {
+    return {
+      title: 'Flixer - Stream Movies & TV Shows Online',
+      description: 'Watch your favorite movies and TV shows on Flixer. Stream the latest releases and classic titles.',
+      keywords: 'flixer, flixer movies, flixer free movies, watch tv series online, free streaming, hd movies, watch series online, cinematic player, premium streams, cineby, yflix, flixhq',
+      themeColor: '#ef4444',
+      siteName: 'Flixer'
     };
   } else {
     // Default fallback
