@@ -6,22 +6,21 @@
     <!-- Dynamic title & theme setup based on domain -->
     <script>
       (function() {
-        var host = window.location.hostname;
-        var title = "Cinemaos - Stream Movies & TV Shows Online";
+        var host = (window.location.hostname || '').toLowerCase();
+        var title = "CinemaOS — Watch Free Movies, Anime & TV Shows Online in HD | Official CinemaOS";
         var themeColor = "#e11d48";
         if (host.includes("plexmovies")) {
-          title = "PlexMovies - Stream Free Movies & TV Shows Online";
+          title = "PlexMovies — Stream Free Movies & TV Shows Online in Full HD | Official PlexMovies";
           themeColor = "#E5A00D";
         } else if (host.includes("hexa")) {
-          title = "Hexa Watch - Stream Movies & TV Shows Online";
+          title = "Hexa Watch — Watch Free Movies & TV Shows Online in Full HD | Official Hexa Alternative";
           themeColor = "#4f46e5";
         } else if (host.includes("flixer")) {
-          title = "Flixer - Stream Movies & TV Shows Online";
+          title = "Flixer — Stream Movies & TV Series Online Free in Full HD | Official Flixer";
           themeColor = "#ef4444";
         }
         document.title = title;
         
-        // Dynamic theme-color meta tag
         var metaTheme = document.createElement('meta');
         metaTheme.setAttribute('name', 'theme-color');
         metaTheme.setAttribute('content', themeColor);
@@ -30,6 +29,9 @@
     </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="preconnect" href="https://image.tmdb.org" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-0FCNC8NBKH"></script>
     <script>
@@ -45,4 +47,3 @@
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-

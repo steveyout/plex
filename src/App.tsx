@@ -7,6 +7,7 @@ import { MovieCardSkeleton } from './components/MovieCard';
 import DetailModal from './components/DetailModal';
 import VideoPlayer from './components/VideoPlayer';
 import SearchOverlay from './components/SearchOverlay';
+import { SEOSection } from './components/SEOSection';
 import { useSEO } from './utils/seo';
 import { useBrand } from './utils/brand';
 import { MediaItem, NavigationTab, WatchlistItem, PlaybackProgress } from './types';
@@ -607,6 +608,15 @@ export default function App() {
                     onPlayClick={launchPlayer}
                   />
                 </div>
+
+                {/* SEO Semantic Content & FAQ Section */}
+                <SEOSection
+                  onSelectGenre={(id) => {
+                    setActiveTab('movies');
+                    setActiveGenreId(id);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                />
               </motion.div>
             )}
 

@@ -1,88 +1,82 @@
 import { useEffect } from 'react';
+import { getBrandConfig } from './brand';
 
 export function useSEO(title: string, description?: string) {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const hostname = window.location.hostname;
-    const isPlex = hostname.includes('plexmovies');
-    const isHexa = hostname.includes('hexa');
-    const isFlixer = hostname.includes('flixer');
-    const isCinema = hostname.includes('cinemaos') || (!isPlex && !isHexa && !isFlixer);
+    const brand = getBrandConfig(window.location.hostname);
     
-    let siteName = 'Cinemaos';
-    let defaultDesc = 'Beautifully designed website where you can watch anime, drama, movies and read mangas for free. CinemaOS operates as a content aggregator';
-    let themeColor = '#e11d48';
-    
-    if (isPlex) {
-      siteName = 'PlexMovies';
-      defaultDesc = 'Watch free movies, TV series, and live streaming streams in premium HD quality on PlexMovies. Your ultimate free media server library.';
-      themeColor = '#E5A00D';
-    } else if (isHexa) {
-      siteName = 'Hexa Watch';
-      defaultDesc = 'Watch your favorite movies and TV shows on Hexa Watch. Stream the latest releases and classic titles.';
-      themeColor = '#4f46e5';
-    } else if (isFlixer) {
-      siteName = 'Flixer';
-      defaultDesc = 'Watch your favorite movies and TV shows on Flixer. Stream the latest releases and classic titles.';
-      themeColor = '#ef4444';
-    } else {
-      siteName = 'Cinemaos';
-      defaultDesc = 'Beautifully designed website where you can watch anime, drama, movies and read mangas for free. CinemaOS operates as a content aggregator';
-      themeColor = '#e11d48';
-    }
-
     // Set page title
     if (title === 'Home') {
-      if (isPlex) {
-        document.title = 'PlexMovies - Stream Free Movies & TV Shows Online';
-      } else if (isHexa) {
-        document.title = 'Hexa Watch - Stream Movies & TV Shows Online';
-      } else if (isFlixer) {
-        document.title = 'Flixer - Stream Movies & TV Shows Online';
-      } else {
-        document.title = 'Cinemaos - Stream Movies & TV Shows Online';
-      }
+      document.title = brand.title;
     } else {
-      document.title = `${title} | ${siteName}`;
+      document.title = `${title} | ${brand.name}`;
     }
     
-    // Set meta description
+    const pageDesc = title === 'Home' ? brand.description : (description || brand.description);
+
+    // Meta description
     let metaDesc = document.querySelector('meta[name="description"]');
     if (!metaDesc) {
       metaDesc = document.createElement('meta');
       metaDesc.setAttribute('name', 'description');
       document.head.appendChild(metaDesc);
     }
-    // Use the specific brand description for home page to ensure it matches user request
-    metaDesc.setAttribute('content', title === 'Home' ? defaultDesc : (description || defaultDesc));
+    metaDesc.setAttribute('content', pageDesc);
 
-    // Set keywords
+    // Meta keywords
     let metaKeywords = document.querySelector('meta[name="keywords"]');
     if (!metaKeywords) {
       metaKeywords = document.createElement('meta');
       metaKeywords.setAttribute('name', 'keywords');
       document.head.appendChild(metaKeywords);
     }
-    const keywords = isPlex 
-      ? 'plexmovies, plex movies, free movies, watch tv series, free streaming, hd movies, media server, cineby, yflix, flixhq'
-      : isHexa
-      ? 'hexa, hexa watch, movie, series, free movies, watch tv series, free streaming, hd movies, watch series online, cinematic player, premium streams, cineby, yflix, flixhq'
-      : isFlixer
-      ? 'flixer, flixer movies, flixer free movies, watch tv series online, free streaming, hd movies, watch series online, cinematic player, premium streams, cineby, yflix, flixhq'
-      : 'cinemaos, cinema os, cineby, yflix, flixhq, anime, watch anime, read manga, watch drama, free movies, watch tv series, entertainment system, streaming media, content aggregator';
-    metaKeywords.setAttribute('content', keywords);
+    metaKeywords.setAttribute('content', brand.keywords);
 
-    // Set theme-color meta tag dynamically to match the branding
+    // Theme color
     let metaTheme = document.querySelector('meta[name="theme-color"]');
     if (!metaTheme) {
       metaTheme = document.createElement('meta');
       metaTheme.setAttribute('name', 'theme-color');
       document.head.appendChild(metaTheme);
     }
-    metaTheme.setAttribute('content', themeColor);
+    metaTheme.setAttribute('content', brand.accentColor);
 
-    // Inject favicon dynamically
+    // Canonical link
+    let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+    if (!canonicalLink) {
+      canonicalLink = document.createElement('link');
+      canonicalLink.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonicalLink);
+    }
+    canonicalLink.setAttribute('href', brand.canonicalUrl);
+
+    // OpenGraph tags
+    const ogTags: Record<string, string> = {
+      'og:title': title === 'Home' ? brand.title : `${title} | ${brand.name}`,
+      'og:description': pageDesc,
+      'og:url': brand.canonicalUrl,
+      'og:site_name': brand.name,
+      'og:type': 'website',
+      'twitter:card': 'summary_large_image',
+      'twitter:title': title === 'Home' ? brand.title : `${title} | ${brand.name}`,
+      'twitter:description': pageDesc,
+    };
+
+    Object.entries(ogTags).forEach(([prop, val]) => {
+      const isProperty = prop.startsWith('og:');
+      const attr = isProperty ? 'property' : 'name';
+      let tag = document.querySelector(`meta[${attr}="${prop}"]`);
+      if (!tag) {
+        tag = document.createElement('meta');
+        tag.setAttribute(attr, prop);
+        document.head.appendChild(tag);
+      }
+      tag.setAttribute('content', val);
+    });
+
+    // Favicon & Apple Touch Icon
     let favLink = document.querySelector('link[rel="icon"]') as HTMLLinkElement;
     if (!favLink) {
       favLink = document.createElement('link');
@@ -99,5 +93,50 @@ export function useSEO(title: string, description?: string) {
       document.head.appendChild(appleLink);
     }
     appleLink.setAttribute('href', '/apple-touch-icon.png');
+
+    // JSON-LD Structured Data
+    let schemaScript = document.getElementById('brand-schema-jsonld') as HTMLScriptElement;
+    if (!schemaScript) {
+      schemaScript = document.createElement('script');
+      schemaScript.id = 'brand-schema-jsonld';
+      schemaScript.type = 'application/ld+json';
+      document.head.appendChild(schemaScript);
+    }
+
+    const schemas = [
+      {
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: brand.name,
+        alternateName: [brand.shortName, brand.domain],
+        url: brand.canonicalUrl,
+        potentialAction: {
+          '@type': 'SearchAction',
+          target: `${brand.canonicalUrl}/?search={search_term_string}`,
+          'query-input': 'required name=search_term_string',
+        },
+      },
+      {
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        name: brand.name,
+        url: brand.canonicalUrl,
+        logo: `${brand.canonicalUrl}/favicon.svg`,
+      },
+      {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: brand.faqs.map((faq) => ({
+          '@type': 'Question',
+          name: faq.question,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: faq.answer,
+          },
+        })),
+      },
+    ];
+
+    schemaScript.text = JSON.stringify(schemas);
   }, [title, description]);
 }
